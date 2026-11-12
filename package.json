@@ -1,0 +1,14 @@
+{
+  "name": "heartai-frontend-animations",
+  "version": "1.0.0",
+  "description": "Frontend animation assets for HeartAI (GSAP, ScrollTrigger, Lottie)",
+  "private": true,
+  "scripts": {
+    "postinstall": "echo Frontend animation dependencies installed."
+  },
+  "dependencies": {
+    "gsap": "^3.12.5",
+    "lottie-web": "^5.12.2"
+  }
+}
+

@@ -1,0 +1,93 @@
+# ==============================================================================
+# HeartAI — Git Ignore Rules
+# Enterprise ML & Healthcare Privacy Compliance
+# ==============================================================================
+
+# Security, Credentials & Private API Keys (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+token.json
+client_secret*.json
+service_account.json
+google_credentials.json
+
+# Private Clinical Datasets & Sensitive Patient Records
+data/
+datasets/
+raw_data/
+patient_data/
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.dcm
+*.dicom
+*.dat
+
+# Large Model Checkpoints & Raw Artifacts (Transferred via Drive / GH Release)
+models/weights/
+models/checkpoints/
+*.pt
+*.pth
+*.bin
+*.onnx
+*.safetensors
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyd.cydisabled
+.pycache/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing, Quality & Coverage
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Jupyter & IPython
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# Node & Frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+
+# Database & Logs
+*.sqlite
+*.sqlite3
+*.db
+logs/
+*.log
+
+# OS & Editor Specific
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Antigravity & Agent Scratch Artifacts
+.gemini/
+scratch/

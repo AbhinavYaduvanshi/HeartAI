@@ -1,0 +1,92 @@
+{
+  "model_id": "heartai-rf-v1",
+  "model_name": "HeartAI Random Forest Baseline",
+  "version": "1.0.0",
+  "architecture": "RandomForestClassifier",
+  "artifact_format": "joblib",
+  "artifact_filename": "model.joblib",
+  "sha256_checksum": "91fc0f9dc8dc8cd4adfd42b75a743e538ae6aa9e2386e46a3c7f936b5042a3a3",
+  "dataset_source": "UCI Cleveland Benchmark",
+  "features": [
+    {
+      "name": "age",
+      "data_type": "float64",
+      "display_name": "Age"
+    },
+    {
+      "name": "sex",
+      "data_type": "int64",
+      "display_name": "Biological Sex"
+    },
+    {
+      "name": "cp",
+      "data_type": "int64",
+      "display_name": "Chest Pain Type"
+    },
+    {
+      "name": "trestbps",
+      "data_type": "float64",
+      "display_name": "Resting BP"
+    },
+    {
+      "name": "chol",
+      "data_type": "float64",
+      "display_name": "Serum Cholesterol"
+    },
+    {
+      "name": "fbs",
+      "data_type": "int64",
+      "display_name": "Fasting Blood Sugar"
+    },
+    {
+      "name": "restecg",
+      "data_type": "int64",
+      "display_name": "Resting ECG"
+    },
+    {
+      "name": "thalach",
+      "data_type": "float64",
+      "display_name": "Max Heart Rate"
+    },
+    {
+      "name": "exang",
+      "data_type": "int64",
+      "display_name": "Exercise Angina"
+    },
+    {
+      "name": "oldpeak",
+      "data_type": "float64",
+      "display_name": "ST Depression"
+    },
+    {
+      "name": "slope",
+      "data_type": "int64",
+      "display_name": "ST Slope"
+    },
+    {
+      "name": "ca",
+      "data_type": "int64",
+      "display_name": "Major Vessels"
+    },
+    {
+      "name": "thal",
+      "data_type": "int64",
+      "display_name": "Thallium Stress"
+    }
+  ],
+  "metrics": {
+    "accuracy": 0.884,
+    "roc_auc": 0.932,
+    "sensitivity_recall": 0.892,
+    "specificity": 0.875,
+    "f1_score": 0.881,
+    "precision": 0.871,
+    "brier_score": 0.095
+  },
+  "tags": [
+    "random_forest",
+    "baseline",
+    "uci_cleveland"
+  ],
+  "is_active_production": true
+}

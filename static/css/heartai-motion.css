@@ -1,0 +1,285 @@
+/**
+ * HeartAI Advanced Motion & Animation System
+ * Enterprise CSS Transitions & Performance-Engineered Keyframes
+ */
+
+:root {
+  --heartai-teal: #0d9488;
+  --heartai-teal-light: #14b8a6;
+  --heartai-teal-glow: rgba(13, 148, 136, 0.25);
+  --heartai-coral: #ef4444;
+  --heartai-coral-glow: rgba(239, 68, 68, 0.25);
+  --heartai-navy: #0f172a;
+  --heartai-card-bg: rgba(255, 255, 255, 0.92);
+  --heartai-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --heartai-ease-in-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   1. ACCESSIBILITY & REDUCED MOTION (Strict Compliance)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .heartai-pulse,
+  .heartai-float,
+  .heartai-ecg-path,
+  .heartai-parallax-bg {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   2. HERO ANIMATIONS
+   ========================================================================== */
+.heartai-hero-headline {
+  will-change: transform, opacity;
+}
+
+.heartai-teal-accent {
+  display: inline-block;
+  position: relative;
+  color: var(--heartai-teal);
+  background: linear-gradient(120deg, var(--heartai-teal), var(--heartai-teal-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  will-change: transform, opacity;
+}
+
+.heartai-heart-visual {
+  transform-origin: center center;
+  will-change: transform, filter;
+  filter: drop-shadow(0 10px 25px var(--heartai-coral-glow));
+}
+
+/* Subtle anatomical breathing pulse */
+.heartai-pulse {
+  animation: heartai-cardiac-pulse 2.2s infinite var(--heartai-ease-in-out-smooth);
+}
+
+@keyframes heartai-cardiac-pulse {
+  0% { transform: scale(1); filter: drop-shadow(0 10px 20px var(--heartai-coral-glow)); }
+  12% { transform: scale(1.08); filter: drop-shadow(0 14px 28px rgba(239, 68, 68, 0.4)); }
+  22% { transform: scale(0.98); }
+  32% { transform: scale(1.04); }
+  45% { transform: scale(1); filter: drop-shadow(0 10px 20px var(--heartai-coral-glow)); }
+  100% { transform: scale(1); filter: drop-shadow(0 10px 20px var(--heartai-coral-glow)); }
+}
+
+/* ECG Waveform Path */
+.heartai-ecg-svg {
+  overflow: visible;
+  filter: drop-shadow(0 2px 8px var(--heartai-teal-glow));
+}
+
+.heartai-ecg-path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  will-change: stroke-dashoffset;
+}
+
+/* Interactive Button Hover Physics */
+.heartai-btn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.28s var(--heartai-ease-out-expo),
+              box-shadow 0.28s var(--heartai-ease-out-expo),
+              background-color 0.28s ease;
+  will-change: transform, box-shadow;
+}
+
+.heartai-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px var(--heartai-teal-glow);
+}
+
+.heartai-btn:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 8px var(--heartai-teal-glow);
+}
+
+.heartai-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  height: 150%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 60%);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.5s ease-out, opacity 0.3s ease-out;
+}
+
+.heartai-btn:hover::after {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* ==========================================================================
+   3. NAVIGATION ANIMATIONS
+   ========================================================================== */
+.heartai-navbar {
+  transition: background-color 0.35s ease,
+              backdrop-filter 0.35s ease,
+              box-shadow 0.35s ease,
+              padding 0.35s var(--heartai-ease-out-expo);
+  will-change: background-color, backdrop-filter, box-shadow;
+}
+
+.heartai-navbar.heartai-nav-scrolled {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  padding-top: 0.65rem !important;
+  padding-bottom: 0.65rem !important;
+}
+
+/* Active Link Sliding Underline Indicator */
+.heartai-nav-link {
+  position: relative;
+  transition: color 0.24s ease;
+}
+
+.heartai-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2.5px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--heartai-teal), var(--heartai-teal-light));
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.3s var(--heartai-ease-out-expo);
+}
+
+.heartai-nav-link:hover::after,
+.heartai-nav-link.active::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* ==========================================================================
+   4. DOCTOR IMAGES & CARDS
+   ========================================================================== */
+.heartai-doctor-card {
+  transition: transform 0.35s var(--heartai-ease-out-expo),
+              box-shadow 0.35s var(--heartai-ease-out-expo),
+              border-color 0.35s ease;
+  will-change: transform, box-shadow;
+}
+
+.heartai-doctor-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 16px 36px rgba(13, 148, 136, 0.12), 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+.heartai-doctor-img-wrap {
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.heartai-doctor-img {
+  transition: transform 0.6s var(--heartai-ease-out-expo), filter 0.4s ease;
+  will-change: transform;
+}
+
+.heartai-doctor-card:hover .heartai-doctor-img {
+  transform: scale(1.06);
+}
+
+/* ==========================================================================
+   5. ANALYTICS & HEALTH METRICS
+   ========================================================================== */
+.heartai-metric-card {
+  will-change: transform, opacity;
+  transition: transform 0.28s var(--heartai-ease-out-expo),
+              box-shadow 0.28s var(--heartai-ease-out-expo);
+}
+
+.heartai-metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.07);
+}
+
+/* Circular Progress Rings */
+.heartai-ring-svg {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.heartai-ring-bg {
+  stroke: rgba(226, 232, 240, 0.8);
+}
+
+.heartai-ring-circle {
+  transition: stroke-dashoffset 1.4s var(--heartai-ease-out-expo);
+  stroke-linecap: round;
+  will-change: stroke-dashoffset;
+}
+
+/* Risk Gauge Arc */
+.heartai-gauge-svg {
+  overflow: visible;
+}
+
+.heartai-gauge-needle {
+  transform-origin: 50% 100%;
+  transition: transform 1.2s var(--heartai-ease-out-expo);
+  will-change: transform;
+}
+
+/* Numerical Statistics Counter */
+.heartai-counter {
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+}
+
+/* ==========================================================================
+   6. BOTTOM DOCTOR BANNER & PARALLAX
+   ========================================================================== */
+.heartai-banner-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.heartai-parallax-bg {
+  position: absolute;
+  top: -15%;
+  left: 0;
+  width: 100%;
+  height: 130%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.heartai-banner-reveal-img {
+  will-change: transform, opacity;
+}
+
+.heartai-banner-text {
+  will-change: transform, opacity;
+}
+
+/* Subtle Floating Elements */
+.heartai-float {
+  animation: heartai-float-motion 4s ease-in-out infinite alternate;
+}
+
+@keyframes heartai-float-motion {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-8px); }
+}
+
