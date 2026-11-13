@@ -3,6 +3,14 @@
 Multi-format model loading, metadata enforcement, and clinical inference.
 """
 
+from app.ml.custom_ensembles import (
+    EnrichedRandomForestClassifier,
+    TreeWeightedRandomForestClassifier,
+)
+from app.ml.explainability import (
+    calculate_demographic_fairness,
+    extract_feature_importances,
+)
 from app.ml.model_loader import (
     ModelCompatibilityError,
     ModelSecurityError,
@@ -21,12 +29,24 @@ from app.ml.model_metadata import (
 )
 from app.ml.model_registry import ModelRegistry, registry
 from app.ml.predict import (
+    EducationalPredictionResponse,
     PatientClinicalInput,
     PatientPredictionResult,
     categorize_risk_score,
+    predict_educational_estimate,
     predict_heart_disease,
 )
+from app.ml.preprocessing import (
+    ALL_INPUT_FEATURES,
+    build_preprocessing_pipeline,
+    prepare_feature_dataframe,
+)
 from app.ml.transfer_sync import ModelTransferManager, transfer_manager
+from app.ml.validation import (
+    ClinicalInputValidationError,
+    PatientBRFSSInput,
+    validate_input_dict,
+)
 
 __all__ = [
     "CANONICAL_HEART_FEATURES",
@@ -47,6 +67,18 @@ __all__ = [
     "PatientPredictionResult",
     "categorize_risk_score",
     "predict_heart_disease",
+    "EducationalPredictionResponse",
+    "predict_educational_estimate",
     "ModelTransferManager",
     "transfer_manager",
+    "EnrichedRandomForestClassifier",
+    "TreeWeightedRandomForestClassifier",
+    "build_preprocessing_pipeline",
+    "prepare_feature_dataframe",
+    "ALL_INPUT_FEATURES",
+    "PatientBRFSSInput",
+    "validate_input_dict",
+    "ClinicalInputValidationError",
+    "extract_feature_importances",
+    "calculate_demographic_fairness",
 ]

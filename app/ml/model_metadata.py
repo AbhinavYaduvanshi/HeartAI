@@ -19,6 +19,9 @@ class ModelArtifactFormat(StrEnum):
     JOBLIB = "joblib"
     PICKLE = "pkl"
     PYTORCH = "pt"
+    JSON = "json"
+    TXT = "txt"
+    CBM = "cbm"
 
 
 class ClinicalRiskCategory(StrEnum):
@@ -47,11 +50,18 @@ class ModelMetrics(BaseModel):
 
     accuracy: float = Field(..., ge=0.0, le=1.0)
     roc_auc: float = Field(..., ge=0.0, le=1.0)
-    sensitivity_recall: float = Field(..., ge=0.0, le=1.0, description="True Positive Rate (Arrhythmia/CAD)")
+    sensitivity_recall: float | None = Field(None, ge=0.0, le=1.0, description="True Positive Rate (Recall)")
+    recall_sensitivity: float | None = Field(None, ge=0.0, le=1.0, description="Alias for sensitivity_recall")
     specificity: float = Field(..., ge=0.0, le=1.0, description="True Negative Rate")
     f1_score: float = Field(..., ge=0.0, le=1.0)
     precision: float = Field(..., ge=0.0, le=1.0)
     brier_score: float | None = Field(None, ge=0.0, le=1.0, description="Probabilistic calibration metric")
+
+    def model_post_init(self, __context: Any) -> None:
+        if self.sensitivity_recall is None and self.recall_sensitivity is not None:
+            self.sensitivity_recall = self.recall_sensitivity
+        elif self.recall_sensitivity is None and self.sensitivity_recall is not None:
+            self.recall_sensitivity = self.sensitivity_recall
 
 
 class ModelMetadata(BaseModel):
@@ -74,7 +84,7 @@ class ModelMetadata(BaseModel):
         description="Clinical dataset provenance",
     )
     features: list[FeatureSpecification] = Field(
-        ...,
+        default_factory=list,
         description="Ordered list of required input clinical features",
     )
     metrics: ModelMetrics = Field(..., description="Evaluation benchmark metrics")

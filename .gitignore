@@ -21,6 +21,7 @@ datasets/
 raw_data/
 patient_data/
 *.csv
+!models/model_comparison.csv
 *.tsv
 *.parquet
 *.feather
@@ -33,11 +34,18 @@ patient_data/
 # Large Model Checkpoints & Raw Artifacts (Transferred via Drive / GH Release)
 models/weights/
 models/checkpoints/
+catboost_info/
 *.pt
 *.pth
 *.bin
 *.onnx
 *.safetensors
+*.cbm
+*.joblib
+!models/best_model.joblib
+!models/logistic_regression.joblib
+!models/preprocessing_pipeline.joblib
+!models/heartai-rf-v1/model.joblib
 
 # Python Bytecode & Cache
 __pycache__/

@@ -15,6 +15,8 @@ from pydantic import BaseModel, Field
 
 from app.ml.model_metadata import ClinicalRiskCategory
 from app.ml.model_registry import registry
+from app.ml.preprocessing import prepare_feature_dataframe
+from app.ml.validation import PatientBRFSSInput, validate_input_dict
 
 logger = logging.getLogger("heartai.ml.predict")
 
@@ -227,3 +229,97 @@ def predict_heart_disease(
         primary_risk_factors=factors,
         recommendations=recommendations,
     )
+
+
+class EducationalPredictionResponse(BaseModel):
+    """Structured educational cardiovascular risk estimate matching Step 13 requirements."""
+
+    model_name: str = Field(..., description="Name of the selected machine learning model")
+    model_version: str = Field("2.0.0", description="Model semantic version")
+    prediction: int = Field(..., description="Binary estimate: 1 = Reported MI/CHD pattern, 0 = Negative")
+    estimated_probability: float = Field(..., ge=0.0, le=1.0, description="Continuous model output probability")
+    output_type: str = Field("educational_estimate", description="Explicit indicator of non-clinical purpose")
+    clinical_validation: bool = Field(False, description="Always False: educational research prototype")
+    limitations: list[str] = Field(default_factory=list, description="Documented epidemiological and methodological caveats")
+
+
+STANDARD_RESEARCH_LIMITATIONS = [
+    "Educational research prototype only: NOT clinically validated or intended for diagnosis.",
+    "Survey data source (CDC BRFSS 2023): self-reported historical disease status, not prospective event risk.",
+    "Target leakage excluded: model does not use source clinical diagnosis questions (CVDINFR4, CVDCRHD4).",
+    "Survey sampling bias: individual estimates do not incorporate complex multi-stage sampling weights (_LLCPWT).",
+    "Model probabilities reflect population correlation, not individual biological causality.",
+]
+
+
+def predict_educational_estimate(
+    patient_data: dict[str, Any] | PatientBRFSSInput,
+    model_name: str = "best_model",
+) -> EducationalPredictionResponse:
+    """Computes an educational cardiovascular risk estimate using the trained BRFSS ensemble.
+
+    Adheres strictly to research limitations:
+    - No unsupported clinical risk labels (high/medium/low).
+    - No arbitrary probability cutoffs.
+    - Full transparency on educational purpose and non-diagnostic status.
+    """
+    from pathlib import Path
+
+    import joblib
+
+    # 1. Validate input data
+    if isinstance(patient_data, PatientBRFSSInput):
+        clean_dict = patient_data.model_dump()
+    else:
+        clean_dict = validate_input_dict(patient_data)
+
+    # Privacy-conscious logging: log feature presence and risk estimate without any personal identifiers
+    logger.info(
+        "Computing educational estimate with model '%s' (AgeCat=%s, Sex=%s, HighBP=%s)",
+        model_name,
+        clean_dict.get("AgeCategory"),
+        clean_dict.get("Sex_Male"),
+        clean_dict.get("HighBP"),
+    )
+
+    # 2. Format input DataFrame matching preprocessing pipeline
+    input_df = prepare_feature_dataframe(clean_dict)
+
+    # 3. Load preprocessing pipeline
+    models_dir = Path("models")
+    pipeline_path = models_dir / "preprocessing_pipeline.joblib"
+    if not pipeline_path.exists():
+        raise FileNotFoundError(f"Preprocessing pipeline not found at {pipeline_path}")
+
+    preprocessor = joblib.load(pipeline_path)
+    X_proc = preprocessor.transform(input_df)
+
+    # 4. Load requested model
+    model_filename = f"{model_name}.joblib" if not model_name.endswith((".joblib", ".json", ".cbm", ".txt")) else model_name
+    model_path = models_dir / model_filename
+    if not model_path.exists():
+        # Fallback to best_model.joblib
+        model_path = models_dir / "best_model.joblib"
+        model_name = "best_model"
+
+    model = joblib.load(model_path)
+
+    # 5. Inference
+    if hasattr(model, "predict_proba"):
+        probs = model.predict_proba(X_proc)
+        prob = float(probs[0][1])
+    else:
+        prob = float(model.predict(X_proc)[0])
+
+    pred = 1 if prob >= 0.50 else 0
+
+    return EducationalPredictionResponse(
+        model_name=model_name,
+        model_version="2.0.0",
+        prediction=pred,
+        estimated_probability=round(prob, 4),
+        output_type="educational_estimate",
+        clinical_validation=False,
+        limitations=STANDARD_RESEARCH_LIMITATIONS,
+    )
+

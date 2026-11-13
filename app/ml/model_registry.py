@@ -22,8 +22,13 @@ MODELS_DIR = Path("models")
 class ModelRegistry:
     """Thread-safe registry for model lifecycle, versioning, and caching."""
 
-    def __init__(self, models_root: Path | str = MODELS_DIR):
-        self.models_root = Path(models_root)
+    def __init__(
+        self,
+        models_root: Path | str | None = None,
+        models_dir: Path | str | None = None,
+    ):
+        root = models_dir if models_dir is not None else (models_root or MODELS_DIR)
+        self.models_root = Path(root)
         self.models_root.mkdir(parents=True, exist_ok=True)
         self._cache: dict[str, tuple[Any, ModelMetadata]] = {}
         self._active_model_id: str | None = None

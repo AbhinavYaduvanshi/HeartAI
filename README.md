@@ -47,17 +47,50 @@ This architecture decouples the training and serving lifecycle:
 
 ---
 
-## Google Colab Training Notebooks
+## Research & Machine Learning Benchmark (Point 6)
 
-All training, exploration, and model serialization workflows are split into 5 modular, Colab-ready notebooks in [`notebooks/`](notebooks/):
+The comprehensive research report, methodology, and 14-algorithm comparative study on **397,870 genuine respondents** from the **CDC BRFSS 2023** survey is documented in [RESEARCH_REPORT.md](RESEARCH_REPORT.md).
 
-| Notebook | Purpose | Colab Launcher |
+### Top Performing Algorithms Summary (Untouched 20% Test Dataset, N=6,000)
+
+| Rank | Algorithm | Test ROC-AUC | Test Balanced Acc | Sensitivity (Recall) | Specificity | F1 Score | Weighted ROC-AUC |
+| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1** | **Logistic Regression (Balanced)** | **0.8522** | **0.7697** | **0.8031** | **0.7363** | **0.3474** | **0.8920** |
+| **2** | **CatBoost Classifier** | **0.8522** | **0.7638** | **0.7914** | **0.7361** | **0.3431** | **0.8886** |
+| 3 | Calibrated Support Vector Machine | 0.8522 | 0.5598 | 0.1306 | 0.9891 | 0.2094 | 0.8922 |
+| 4 | Stacking Classifier (Meta LR) | 0.8519 | 0.5412 | 0.0877 | 0.9947 | 0.1533 | 0.8896 |
+| 5 | Gradient Boosting (GBDT) | 0.8515 | 0.5629 | 0.1345 | 0.9913 | 0.2190 | 0.8837 |
+| 6 | XGBoost Classifier | 0.8506 | 0.7660 | 0.7953 | 0.7367 | 0.3449 | 0.8846 |
+| 7 | LightGBM Classifier | 0.8493 | 0.7663 | 0.7778 | 0.7549 | 0.3536 | 0.8854 |
+| 8 | Tree-Weighted Random Forest (TWRF) | 0.8431 | 0.5228 | 0.0468 | 0.9987 | 0.0882 | 0.8772 |
+| 9 | Random Forest (Balanced) | 0.8420 | 0.7673 | 0.8012 | 0.7334 | 0.3444 | 0.8772 |
+| 10 | Extra Trees Classifier | 0.8416 | 0.7631 | 0.7973 | 0.7290 | 0.3396 | 0.8769 |
+| 11 | Enriched Random Forest (ERF) | 0.8404 | 0.5314 | 0.0702 | 0.9927 | 0.1222 | 0.8735 |
+| 12 | CART Decision Tree (Gini) | 0.8214 | 0.7560 | 0.8304 | 0.6816 | 0.3172 | 0.8611 |
+| 13 | AdaBoost Classifier | 0.8189 | 0.5000 | 0.0000 | 1.0000 | 0.0000 | 0.8600 |
+| 14 | Entropy Decision Tree | 0.8152 | 0.7420 | 0.8051 | 0.6789 | 0.3073 | 0.8146 |
+
+---
+
+## Google Colab Research Notebooks Directory
+
+The 13 dedicated, self-contained Google Colab notebooks are organized in [`notebooks/`](notebooks/):
+
+| Notebook | Focus | Colab Launcher |
 | :--- | :--- | :---: |
-| **1. Data Preprocessing** | Missing value imputation, standard scaling, and stratified train/val/test splits. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/data_preprocessing.ipynb) |
-| **2. Exploratory Data Analysis** | Physiological distributions (BP, cholesterol, max HR), KDE plots, correlation matrices. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/exploratory_data_analysis.ipynb) |
-| **3. Model Training** | Trains Random Forest, XGBoost (`XGBClassifier`), and PyTorch Deep MLP (`CardiacDeepNet`). | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/heart_disease_model_training.ipynb) |
-| **4. Model Evaluation** | ROC-AUC, confusion matrices, sensitivity (recall), specificity, and Brier calibration curves. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/model_evaluation.ipynb) |
-| **5. Model Export & Integrity** | Computes SHA-256 digests and outputs `model.joblib` and canonical `metadata.json` to Drive. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/model_export.ipynb) |
+| **01. Dataset Collection** | Ingestion of raw CDC BRFSS 2023 SAS XPT data & codebook verification. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/01_dataset_collection.ipynb) |
+| **02. Exploratory Data Analysis** | Physiological distributions, demographic risk stratification, correlation heatmaps. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/02_exploratory_data_analysis.ipynb) |
+| **03. Data Preprocessing** | Zero-leakage ColumnTransformer, median imputation, physiological clipping, scaling. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/03_data_preprocessing.ipynb) |
+| **04. Bagging Algorithms** | Comparative benchmarking of Random Forest and Extra Trees. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/04_bagging_algorithms.ipynb) |
+| **05. Boosting Algorithms** | AdaBoost, Gradient Boosting (GBDT), XGBoost, LightGBM, and CatBoost. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/05_boosting_algorithms.ipynb) |
+| **06. Decision Trees** | CART (Gini impurity) vs. Entropy-based Decision Trees. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/06_decision_tree_algorithms.ipynb) |
+| **07. Stacking Ensemble** | Multi-model stacking combining linear, tree, and boosting base estimators. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/07_stacking_algorithms.ipynb) |
+| **08. Custom Ensembles** | Implementation of Enriched Random Forest (ERF) & Tree-Weighted RF (TWRF). | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/08_custom_ensemble_algorithms.ipynb) |
+| **09. Hyperparameter Tuning** | 5-Fold Stratified Cross-Validation with RandomizedSearchCV. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/09_hyperparameter_tuning.ipynb) |
+| **10. Model Evaluation** | ROC curves, PR-AUC, Brier score, and reliability calibration curves. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/10_model_evaluation.ipynb) |
+| **11. Model Explainability** | SHAP TreeExplainer, feature importance rankings, demographic fairness parity checks. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/11_model_explainability.ipynb) |
+| **12. Model Comparison** | Comprehensive multi-metric ranking and latency benchmarks. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/12_model_comparison.ipynb) |
+| **13. Model Export** | SHA-256 verified artifact packaging and Google Drive export synchronization. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/13_model_export.ipynb) |
 
 ---
 

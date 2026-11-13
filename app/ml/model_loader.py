@@ -84,6 +84,12 @@ def load_model_artifact(
         format_type = ModelArtifactFormat.PICKLE
     elif suffix in {"pt", "pth"}:
         format_type = ModelArtifactFormat.PYTORCH
+    elif suffix in {"json"}:
+        format_type = ModelArtifactFormat.JSON
+    elif suffix in {"txt"}:
+        format_type = ModelArtifactFormat.TXT
+    elif suffix in {"cbm"}:
+        format_type = ModelArtifactFormat.CBM
     else:
         raise ModelCompatibilityError(f"Unsupported model artifact extension: .{suffix}")
 
@@ -107,6 +113,26 @@ def load_model_artifact(
             except Exception:
                 model = torch.jit.load(path, map_location=target_device)
             logger.info("Loaded PyTorch model to device %s: %s", device, path.name)
+            return model
+
+        elif format_type == ModelArtifactFormat.JSON:
+            from xgboost import XGBClassifier
+            model = XGBClassifier()
+            model.load_model(str(path))
+            logger.info("Loaded XGBoost JSON model: %s", path.name)
+            return model
+
+        elif format_type == ModelArtifactFormat.TXT:
+            import lightgbm as lgb
+            model = lgb.Booster(model_file=str(path))
+            logger.info("Loaded LightGBM text model: %s", path.name)
+            return model
+
+        elif format_type == ModelArtifactFormat.CBM:
+            from catboost import CatBoostClassifier
+            model = CatBoostClassifier()
+            model.load_model(str(path))
+            logger.info("Loaded CatBoost CBM model: %s", path.name)
             return model
 
     except Exception as exc:
