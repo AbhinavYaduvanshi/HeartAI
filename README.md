@@ -53,11 +53,11 @@ All training, exploration, and model serialization workflows are split into 5 mo
 
 | Notebook | Purpose | Colab Launcher |
 | :--- | :--- | :---: |
-| **1. Data Preprocessing** | Missing value imputation, standard scaling, and stratified train/val/test splits. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/24abh/HeartAI/blob/main/notebooks/data_preprocessing.ipynb) |
-| **2. Exploratory Data Analysis** | Physiological distributions (BP, cholesterol, max HR), KDE plots, correlation matrices. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/24abh/HeartAI/blob/main/notebooks/exploratory_data_analysis.ipynb) |
-| **3. Model Training** | Trains Random Forest, XGBoost (`XGBClassifier`), and PyTorch Deep MLP (`CardiacDeepNet`). | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/24abh/HeartAI/blob/main/notebooks/heart_disease_model_training.ipynb) |
-| **4. Model Evaluation** | ROC-AUC, confusion matrices, sensitivity (recall), specificity, and Brier calibration curves. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/24abh/HeartAI/blob/main/notebooks/model_evaluation.ipynb) |
-| **5. Model Export & Integrity** | Computes SHA-256 digests and outputs `model.joblib` and canonical `metadata.json` to Drive. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/24abh/HeartAI/blob/main/notebooks/model_export.ipynb) |
+| **1. Data Preprocessing** | Missing value imputation, standard scaling, and stratified train/val/test splits. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/data_preprocessing.ipynb) |
+| **2. Exploratory Data Analysis** | Physiological distributions (BP, cholesterol, max HR), KDE plots, correlation matrices. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/exploratory_data_analysis.ipynb) |
+| **3. Model Training** | Trains Random Forest, XGBoost (`XGBClassifier`), and PyTorch Deep MLP (`CardiacDeepNet`). | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/heart_disease_model_training.ipynb) |
+| **4. Model Evaluation** | ROC-AUC, confusion matrices, sensitivity (recall), specificity, and Brier calibration curves. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/model_evaluation.ipynb) |
+| **5. Model Export & Integrity** | Computes SHA-256 digests and outputs `model.joblib` and canonical `metadata.json` to Drive. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AbhinavYaduvanshi/HeartAI/blob/main/notebooks/model_export.ipynb) |
 
 ---
 
@@ -123,7 +123,7 @@ For versioned team releases:
    from app.ml.transfer_sync import transfer_manager
 
    transfer_manager.import_from_github_release(
-       repo="24abh/HeartAI",
+       repo="AbhinavYaduvanshi/HeartAI",
        tag="v1.0.0",
        set_active=True
    )
@@ -215,3 +215,4 @@ HeartAI enforces strict test coverage and linting standards:
 - **Cryptographic Model Verification:** All imported model bundles require matching SHA-256 digests before execution.
 - **Strict Boundary Checks:** The model loader rejects unrecognized architectures and ensures inputs conform to canonical physiological boundaries.
 - **Safe Heuristic Fallbacks:** If a machine learning model is unavailable, the inference pipeline automatically engages a clinical Framingham-based baseline estimator to prevent silent server failure.
+

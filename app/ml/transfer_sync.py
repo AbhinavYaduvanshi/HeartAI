@@ -75,7 +75,7 @@ class ModelTransferManager:
 
     def import_from_github_release(
         self,
-        repo: str = "24abh/HeartAI",
+        repo: str = "AbhinavYaduvanshi/HeartAI",
         tag: str = "latest",
         model_id: str | None = None,
         set_active: bool = True,
