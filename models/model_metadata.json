@@ -1,23 +1,44 @@
 {
-  "model_id": "heartai-logistic-regression-v2",
-  "model_name": "HeartAI BRFSS Research Classifier (logistic_regression)",
-  "version": "2.0.0",
+  "model_id": "heartai-logistic-regression-v2-full",
+  "model_name": "HeartAI BRFSS Research Classifier (Logistic Regression)",
+  "version": "2.1.0",
   "architecture": "logistic_regression",
   "artifact_format": "joblib",
   "artifact_filename": "best_model.joblib",
-  "sha256_checksum": "03a3dc17bb69fcb065b7722cb3fbea8ba43aa368273737a2af84cf5f1407dd1b",
+  "sha256_checksum": "f956400429beab6bed4c77263b45cb9d4d7c701d2db1720ec423df9730b23fb5",
+  "training_records": 318296,
+  "test_records": 79574,
   "dataset_source": "CDC BRFSS 2023 (N=397,870 usable records)",
+  "target_definition": "Estimated probability of reported historical cardiovascular disease (_MICHD: 1=Yes, 0=No)",
   "metrics": {
-    "accuracy": 0.742,
-    "balanced_accuracy": 0.7697,
-    "precision": 0.2216,
-    "recall_sensitivity": 0.8031,
-    "specificity": 0.7363,
-    "f1_score": 0.3474,
-    "roc_auc": 0.8522,
-    "pr_auc": 0.3605,
-    "brier_score": 0.1676
+    "accuracy": 0.7469,
+    "balanced_accuracy": 0.7702,
+    "precision": 0.2245,
+    "recall_sensitivity": 0.7982,
+    "specificity": 0.7421,
+    "f1_score": 0.3504,
+    "roc_auc": 0.84645,
+    "pr_auc": 0.3452,
+    "brier_score": 0.166403
+  },
+  "weighted_metrics": {
+    "weighted_roc_auc": 0.874598,
+    "weighted_recall": 0.7775,
+    "weighted_specificity": 0.7421
+  },
+  "latency_benchmark": {
+    "iterations": 2000,
+    "warmup_runs": 100,
+    "mean_latency_us": 141.63,
+    "median_latency_us (P50)": 124.15,
+    "p90_latency_us": 242.51,
+    "p95_latency_us": 288.42,
+    "p99_latency_us": 388.44,
+    "mean_latency_ms": 0.1416,
+    "median_latency_ms (P50)": 0.1241,
+    "p90_latency_ms": 0.2425,
+    "p99_latency_ms": 0.3884
   },
   "is_active_production": true,
-  "educational_disclaimer": "Educational research estimate; not a clinical diagnostic device."
+  "educational_disclaimer": "Educational research estimate; not a clinical diagnostic device. Evaluates self-reported historical survey patterns, not 10-year incident cardiovascular events."
 }

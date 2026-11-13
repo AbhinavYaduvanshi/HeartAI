@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-11-13T13:57:07Z",
+  "model_file": "C:\\Users\\24abh\\OneDrive\\Documents\\heart health moniter system\\models\\best_model.joblib",
+  "model_file_exists": true,
+  "model_file_size_bytes": 1071,
+  "sha256": "f956400429beab6bed4c77263b45cb9d4d7c701d2db1720ec423df9730b23fb5",
+  "fresh_load_success": true,
+  "sample_inference_test": {
+    "input_features_count": 25,
+    "transformed_shape": [
+      1,
+      25
+    ],
+    "predicted_probability": 0.2109,
+    "predicted_class": 0
+  },
+  "latency_benchmark": {
+    "iterations": 2000,
+    "warmup_runs": 100,
+    "mean_latency_us": 141.63,
+    "median_latency_us (P50)": 124.15,
+    "p90_latency_us": 242.51,
+    "p95_latency_us": 288.42,
+    "p99_latency_us": 388.44,
+    "mean_latency_ms": 0.1416,
+    "median_latency_ms (P50)": 0.1241,
+    "p90_latency_ms": 0.2425,
+    "p99_latency_ms": 0.3884
+  }
+}

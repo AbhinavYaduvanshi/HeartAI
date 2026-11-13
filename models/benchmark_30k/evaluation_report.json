@@ -1,0 +1,464 @@
+{
+  "logistic_regression": {
+    "unweighted": {
+      "accuracy": 0.742,
+      "balanced_accuracy": 0.7697,
+      "precision": 0.2216,
+      "recall_sensitivity": 0.8031,
+      "specificity": 0.7363,
+      "f1_score": 0.3474,
+      "roc_auc": 0.8522,
+      "pr_auc": 0.3605,
+      "brier_score": 0.1676
+    },
+    "survey_weighted": {
+      "accuracy": 0.8045,
+      "balanced_accuracy": 0.8144,
+      "precision": 0.219,
+      "recall_sensitivity": 0.8258,
+      "specificity": 0.7363,
+      "f1_score": 0.3462,
+      "roc_auc": 0.892,
+      "pr_auc": 0.4049,
+      "brier_score": 0.1295
+    },
+    "training_time_sec": 0.221,
+    "inference_time_ms_per_sample": 0.0002,
+    "cv_summary": {
+      "mean_roc_auc": 0.8522,
+      "std_roc_auc": 0.0041,
+      "mean_f1": 0.358,
+      "mean_balanced_accuracy": 0.7759,
+      "cv_duration_sec": 0.78
+    }
+  },
+  "decision_tree": {
+    "unweighted": {
+      "accuracy": 0.6943,
+      "balanced_accuracy": 0.756,
+      "precision": 0.196,
+      "recall_sensitivity": 0.8304,
+      "specificity": 0.6816,
+      "f1_score": 0.3172,
+      "roc_auc": 0.8214,
+      "pr_auc": 0.2946,
+      "brier_score": 0.1784
+    },
+    "survey_weighted": {
+      "accuracy": 0.7777,
+      "balanced_accuracy": 0.8034,
+      "precision": 0.1977,
+      "recall_sensitivity": 0.8328,
+      "specificity": 0.6816,
+      "f1_score": 0.3195,
+      "roc_auc": 0.8611,
+      "pr_auc": 0.2812,
+      "brier_score": 0.1355
+    },
+    "training_time_sec": 0.049,
+    "inference_time_ms_per_sample": 0.0,
+    "cv_summary": {
+      "mean_roc_auc": 0.8186,
+      "std_roc_auc": 0.0022,
+      "mean_f1": 0.3165,
+      "mean_balanced_accuracy": 0.7504,
+      "cv_duration_sec": 0.24
+    }
+  },
+  "entropy_decision_tree": {
+    "unweighted": {
+      "accuracy": 0.6897,
+      "balanced_accuracy": 0.742,
+      "precision": 0.1899,
+      "recall_sensitivity": 0.8051,
+      "specificity": 0.6789,
+      "f1_score": 0.3073,
+      "roc_auc": 0.8152,
+      "pr_auc": 0.3076,
+      "brier_score": 0.1799
+    },
+    "survey_weighted": {
+      "accuracy": 0.7683,
+      "balanced_accuracy": 0.768,
+      "precision": 0.1814,
+      "recall_sensitivity": 0.7677,
+      "specificity": 0.6789,
+      "f1_score": 0.2935,
+      "roc_auc": 0.8146,
+      "pr_auc": 0.2934,
+      "brier_score": 0.1411
+    },
+    "training_time_sec": 0.052,
+    "inference_time_ms_per_sample": 0.0002,
+    "cv_summary": {
+      "mean_roc_auc": 0.8146,
+      "std_roc_auc": 0.005,
+      "mean_f1": 0.3218,
+      "mean_balanced_accuracy": 0.742,
+      "cv_duration_sec": 0.22
+    }
+  },
+  "random_forest": {
+    "unweighted": {
+      "accuracy": 0.7392,
+      "balanced_accuracy": 0.7673,
+      "precision": 0.2193,
+      "recall_sensitivity": 0.8012,
+      "specificity": 0.7334,
+      "f1_score": 0.3444,
+      "roc_auc": 0.842,
+      "pr_auc": 0.3503,
+      "brier_score": 0.1586
+    },
+    "survey_weighted": {
+      "accuracy": 0.8025,
+      "balanced_accuracy": 0.781,
+      "precision": 0.2064,
+      "recall_sensitivity": 0.7565,
+      "specificity": 0.7334,
+      "f1_score": 0.3244,
+      "roc_auc": 0.8772,
+      "pr_auc": 0.3585,
+      "brier_score": 0.1226
+    },
+    "training_time_sec": 0.32,
+    "inference_time_ms_per_sample": 0.0072,
+    "cv_summary": {
+      "mean_roc_auc": 0.8455,
+      "std_roc_auc": 0.002,
+      "mean_f1": 0.3483,
+      "mean_balanced_accuracy": 0.7656,
+      "cv_duration_sec": 1.68
+    }
+  },
+  "extra_trees": {
+    "unweighted": {
+      "accuracy": 0.7348,
+      "balanced_accuracy": 0.7631,
+      "precision": 0.2157,
+      "recall_sensitivity": 0.7973,
+      "specificity": 0.729,
+      "f1_score": 0.3396,
+      "roc_auc": 0.8416,
+      "pr_auc": 0.3518,
+      "brier_score": 0.1642
+    },
+    "survey_weighted": {
+      "accuracy": 0.7864,
+      "balanced_accuracy": 0.7698,
+      "precision": 0.192,
+      "recall_sensitivity": 0.7507,
+      "specificity": 0.729,
+      "f1_score": 0.3058,
+      "roc_auc": 0.8769,
+      "pr_auc": 0.3652,
+      "brier_score": 0.1325
+    },
+    "training_time_sec": 0.239,
+    "inference_time_ms_per_sample": 0.0077,
+    "cv_summary": {
+      "mean_roc_auc": 0.8421,
+      "std_roc_auc": 0.0027,
+      "mean_f1": 0.3456,
+      "mean_balanced_accuracy": 0.7631,
+      "cv_duration_sec": 1.47
+    }
+  },
+  "enriched_random_forest": {
+    "unweighted": {
+      "accuracy": 0.9138,
+      "balanced_accuracy": 0.5314,
+      "precision": 0.4737,
+      "recall_sensitivity": 0.0702,
+      "specificity": 0.9927,
+      "f1_score": 0.1222,
+      "roc_auc": 0.8404,
+      "pr_auc": 0.334,
+      "brier_score": 0.0662
+    },
+    "survey_weighted": {
+      "accuracy": 0.9381,
+      "balanced_accuracy": 0.5495,
+      "precision": 0.5295,
+      "recall_sensitivity": 0.1052,
+      "specificity": 0.9927,
+      "f1_score": 0.1756,
+      "roc_auc": 0.8735,
+      "pr_auc": 0.3678,
+      "brier_score": 0.0484
+    },
+    "training_time_sec": 3.374,
+    "inference_time_ms_per_sample": 0.0075,
+    "cv_summary": {
+      "mean_roc_auc": 0.8415,
+      "std_roc_auc": 0.0072,
+      "mean_f1": 0.102,
+      "mean_balanced_accuracy": 0.5261,
+      "cv_duration_sec": 10.5
+    }
+  },
+  "tree_weighted_random_forest": {
+    "unweighted": {
+      "accuracy": 0.9173,
+      "balanced_accuracy": 0.5228,
+      "precision": 0.7742,
+      "recall_sensitivity": 0.0468,
+      "specificity": 0.9987,
+      "f1_score": 0.0882,
+      "roc_auc": 0.8431,
+      "pr_auc": 0.3431,
+      "brier_score": 0.0659
+    },
+    "survey_weighted": {
+      "accuracy": 0.9431,
+      "balanced_accuracy": 0.5493,
+      "precision": 0.9316,
+      "recall_sensitivity": 0.099,
+      "specificity": 0.9987,
+      "f1_score": 0.179,
+      "roc_auc": 0.8772,
+      "pr_auc": 0.3718,
+      "brier_score": 0.048
+    },
+    "training_time_sec": 1.417,
+    "inference_time_ms_per_sample": 0.0068,
+    "cv_summary": {
+      "mean_roc_auc": 0.848,
+      "std_roc_auc": 0.0031,
+      "mean_f1": 0.055,
+      "mean_balanced_accuracy": 0.5137,
+      "cv_duration_sec": 5.08
+    }
+  },
+  "adaboost": {
+    "unweighted": {
+      "accuracy": 0.9145,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall_sensitivity": 0.0,
+      "specificity": 1.0,
+      "f1_score": 0.0,
+      "roc_auc": 0.8189,
+      "pr_auc": 0.289,
+      "brier_score": 0.0879
+    },
+    "survey_weighted": {
+      "accuracy": 0.9373,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall_sensitivity": 0.0,
+      "specificity": 1.0,
+      "f1_score": 0.0,
+      "roc_auc": 0.86,
+      "pr_auc": 0.3066,
+      "brier_score": 0.0702
+    },
+    "training_time_sec": 1.159,
+    "inference_time_ms_per_sample": 0.0052,
+    "cv_summary": {
+      "mean_roc_auc": 0.8269,
+      "std_roc_auc": 0.0049,
+      "mean_f1": 0.0,
+      "mean_balanced_accuracy": 0.5,
+      "cv_duration_sec": 5.21
+    }
+  },
+  "gradient_boosting": {
+    "unweighted": {
+      "accuracy": 0.918,
+      "balanced_accuracy": 0.5629,
+      "precision": 0.5897,
+      "recall_sensitivity": 0.1345,
+      "specificity": 0.9913,
+      "f1_score": 0.219,
+      "roc_auc": 0.8515,
+      "pr_auc": 0.3735,
+      "brier_score": 0.0646
+    },
+    "survey_weighted": {
+      "accuracy": 0.9436,
+      "balanced_accuracy": 0.5847,
+      "precision": 0.7022,
+      "recall_sensitivity": 0.1744,
+      "specificity": 0.9913,
+      "f1_score": 0.2794,
+      "roc_auc": 0.8837,
+      "pr_auc": 0.4263,
+      "brier_score": 0.0463
+    },
+    "training_time_sec": 2.647,
+    "inference_time_ms_per_sample": 0.0014,
+    "cv_summary": {
+      "mean_roc_auc": 0.8515,
+      "std_roc_auc": 0.0031,
+      "mean_f1": 0.1919,
+      "mean_balanced_accuracy": 0.5538,
+      "cv_duration_sec": 10.81
+    }
+  },
+  "xgboost": {
+    "unweighted": {
+      "accuracy": 0.7417,
+      "balanced_accuracy": 0.766,
+      "precision": 0.2202,
+      "recall_sensitivity": 0.7953,
+      "specificity": 0.7367,
+      "f1_score": 0.3449,
+      "roc_auc": 0.8506,
+      "pr_auc": 0.3716,
+      "brier_score": 0.1617
+    },
+    "survey_weighted": {
+      "accuracy": 0.7995,
+      "balanced_accuracy": 0.7823,
+      "precision": 0.2048,
+      "recall_sensitivity": 0.7626,
+      "specificity": 0.7367,
+      "f1_score": 0.3229,
+      "roc_auc": 0.8846,
+      "pr_auc": 0.4195,
+      "brier_score": 0.1249
+    },
+    "training_time_sec": 0.156,
+    "inference_time_ms_per_sample": 0.001,
+    "cv_summary": {
+      "mean_roc_auc": 0.8517,
+      "std_roc_auc": 0.0031,
+      "mean_f1": 0.3565,
+      "mean_balanced_accuracy": 0.7759,
+      "cv_duration_sec": 0.61
+    }
+  },
+  "lightgbm": {
+    "unweighted": {
+      "accuracy": 0.7568,
+      "balanced_accuracy": 0.7663,
+      "precision": 0.2288,
+      "recall_sensitivity": 0.7778,
+      "specificity": 0.7549,
+      "f1_score": 0.3536,
+      "roc_auc": 0.8493,
+      "pr_auc": 0.3576,
+      "brier_score": 0.1511
+    },
+    "survey_weighted": {
+      "accuracy": 0.8155,
+      "balanced_accuracy": 0.7826,
+      "precision": 0.217,
+      "recall_sensitivity": 0.7449,
+      "specificity": 0.7549,
+      "f1_score": 0.3361,
+      "roc_auc": 0.8854,
+      "pr_auc": 0.3811,
+      "brier_score": 0.1154
+    },
+    "training_time_sec": 0.264,
+    "inference_time_ms_per_sample": 0.0009,
+    "cv_summary": {
+      "mean_roc_auc": 0.8492,
+      "std_roc_auc": 0.003,
+      "mean_f1": 0.3615,
+      "mean_balanced_accuracy": 0.767,
+      "cv_duration_sec": 1.21
+    }
+  },
+  "catboost": {
+    "unweighted": {
+      "accuracy": 0.7408,
+      "balanced_accuracy": 0.7638,
+      "precision": 0.219,
+      "recall_sensitivity": 0.7914,
+      "specificity": 0.7361,
+      "f1_score": 0.3431,
+      "roc_auc": 0.8522,
+      "pr_auc": 0.3693,
+      "brier_score": 0.1622
+    },
+    "survey_weighted": {
+      "accuracy": 0.7994,
+      "balanced_accuracy": 0.7802,
+      "precision": 0.204,
+      "recall_sensitivity": 0.7581,
+      "specificity": 0.7361,
+      "f1_score": 0.3215,
+      "roc_auc": 0.8886,
+      "pr_auc": 0.4214,
+      "brier_score": 0.1253
+    },
+    "training_time_sec": 1.12,
+    "inference_time_ms_per_sample": 0.0005,
+    "cv_summary": {
+      "mean_roc_auc": 0.8535,
+      "std_roc_auc": 0.0026,
+      "mean_f1": 0.3589,
+      "mean_balanced_accuracy": 0.7785,
+      "cv_duration_sec": 3.81
+    }
+  },
+  "support_vector_machine": {
+    "unweighted": {
+      "accuracy": 0.9157,
+      "balanced_accuracy": 0.5598,
+      "precision": 0.5276,
+      "recall_sensitivity": 0.1306,
+      "specificity": 0.9891,
+      "f1_score": 0.2094,
+      "roc_auc": 0.8522,
+      "pr_auc": 0.3604,
+      "brier_score": 0.0648
+    },
+    "survey_weighted": {
+      "accuracy": 0.9387,
+      "balanced_accuracy": 0.5781,
+      "precision": 0.5354,
+      "recall_sensitivity": 0.1659,
+      "specificity": 0.9891,
+      "f1_score": 0.2533,
+      "roc_auc": 0.8922,
+      "pr_auc": 0.4074,
+      "brier_score": 0.0463
+    },
+    "training_time_sec": 0.266,
+    "inference_time_ms_per_sample": 0.0003,
+    "cv_summary": {
+      "mean_roc_auc": 0.852,
+      "std_roc_auc": 0.004,
+      "mean_f1": 0.197,
+      "mean_balanced_accuracy": 0.5554,
+      "cv_duration_sec": 1.06
+    }
+  },
+  "stacking_classifier": {
+    "unweighted": {
+      "accuracy": 0.9172,
+      "balanced_accuracy": 0.5412,
+      "precision": 0.6081,
+      "recall_sensitivity": 0.0877,
+      "specificity": 0.9947,
+      "f1_score": 0.1533,
+      "roc_auc": 0.8519,
+      "pr_auc": 0.3674,
+      "brier_score": 0.0646
+    },
+    "survey_weighted": {
+      "accuracy": 0.9418,
+      "balanced_accuracy": 0.5601,
+      "precision": 0.7012,
+      "recall_sensitivity": 0.1237,
+      "specificity": 0.9947,
+      "f1_score": 0.2103,
+      "roc_auc": 0.8896,
+      "pr_auc": 0.4136,
+      "brier_score": 0.0467
+    },
+    "training_time_sec": 2.603,
+    "inference_time_ms_per_sample": 0.0061,
+    "cv_summary": {
+      "mean_roc_auc": 0.8534,
+      "std_roc_auc": 0.0035,
+      "mean_f1": 0.1469,
+      "mean_balanced_accuracy": 0.5393,
+      "cv_duration_sec": 53.2
+    }
+  }
+}

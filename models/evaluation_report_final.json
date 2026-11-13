@@ -1,0 +1,73 @@
+{
+  "evaluation_timestamp": "2026-11-13T13:57:07Z",
+  "test_dataset_records": 79574,
+  "test_positives": 6805,
+  "test_negatives": 72769,
+  "test_prevalence_pct": 8.55,
+  "evaluation_status": "Evaluated exactly once on held-out test split.",
+  "unweighted_metrics": {
+    "accuracy": 0.7469,
+    "balanced_accuracy": 0.7702,
+    "precision": 0.2245,
+    "recall_sensitivity": 0.7982,
+    "specificity": 0.7421,
+    "f1_score": 0.3504,
+    "roc_auc": 0.84645,
+    "pr_auc": 0.3452,
+    "brier_score": 0.166403,
+    "confusion_matrix": {
+      "tn": 54003,
+      "fp": 18766,
+      "fn": 1373,
+      "tp": 5432
+    }
+  },
+  "survey_weighted_descriptive_metrics": {
+    "accuracy": 0.81,
+    "balanced_accuracy": 0.7949,
+    "precision": 0.2276,
+    "recall_sensitivity": 0.7775,
+    "specificity": 0.7421,
+    "f1_score": 0.3521,
+    "roc_auc": 0.874598,
+    "pr_auc": 0.3362,
+    "brier_score": 0.128907,
+    "confusion_matrix": {
+      "tn": 54003,
+      "fp": 18766,
+      "fn": 1373,
+      "tp": 5432
+    }
+  },
+  "survey_weight_audit": {
+    "survey_name": "CDC Behavioral Risk Factor Surveillance System (BRFSS) 2023",
+    "sampling_design": "Complex multi-stage stratified cluster sampling",
+    "variables_inspected": {
+      "_LLCPWT": {
+        "name": "Final landline and cellular combined sample weight",
+        "purpose": "Post-stratification raking weight adjusting for unequal selection probability and demographic non-response.",
+        "mean": 576.89,
+        "std": 1170.39,
+        "min": 0.1591,
+        "max": 69785.82
+      },
+      "_STSTR": {
+        "name": "Sample design stratification variable",
+        "purpose": "Geographic and density strata within states to ensure coverage and reduce sampling variance.",
+        "status_in_raw_xpt": "Verified present in raw SAS transport file."
+      },
+      "_PSU": {
+        "name": "Primary Sampling Unit",
+        "purpose": "Cluster variable (telephone block clusters) used to compute complex design effects and standard errors.",
+        "status_in_raw_xpt": "Verified present in raw SAS transport file."
+      }
+    },
+    "methodological_limitations": [
+      "Supervised ML algorithms assume observations are independently and identically distributed (i.i.d.).",
+      "Complex survey designs exhibit clustering (_PSU) and stratification (_STSTR), producing non-i.i.d. correlation structures.",
+      "Sample-weighted loss functions optimize for pseudo-population totals but standard errors from scikit-learn do not reflect design variance without Taylor series linearization or balanced repeated replication.",
+      "Individual user predictions in web deployment do not possess survey weights; inference estimates conditional probability P(Y=1 | X=x) for the specific patient profile.",
+      "Unweighted empirical metrics and weighted descriptive metrics must be reported separately; weighted metrics estimate population-level association, not guaranteed individual clinical diagnostic accuracy."
+    ]
+  }
+}

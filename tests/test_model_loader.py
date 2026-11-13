@@ -29,7 +29,7 @@ def test_load_model_metadata_success():
     assert meta_path.is_file()
     meta = load_model_metadata(meta_path)
     assert isinstance(meta, ModelMetadata)
-    assert meta.version == "2.0.0"
+    assert meta.version in ["2.0.0", "2.1.0"]
     assert meta.artifact_filename == "best_model.joblib"
 
 

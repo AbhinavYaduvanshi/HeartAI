@@ -1,0 +1,27 @@
+{
+  "No Heart Disease": {
+    "precision": 0.975609756097561,
+    "recall": 0.7362857663568434,
+    "f1-score": 0.8392189447444952,
+    "support": 5487.0
+  },
+  "Heart Disease": {
+    "precision": 0.22162452931683702,
+    "recall": 0.8031189083820662,
+    "f1-score": 0.3473861720067454,
+    "support": 513.0
+  },
+  "accuracy": 0.742,
+  "macro avg": {
+    "precision": 0.598617142707199,
+    "recall": 0.7697023373694548,
+    "f1-score": 0.5933025583756203,
+    "support": 6000.0
+  },
+  "weighted avg": {
+    "precision": 0.9111440192078091,
+    "recall": 0.742,
+    "f1-score": 0.7971672426754176,
+    "support": 6000.0
+  }
+}

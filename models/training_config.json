@@ -2,11 +2,10 @@
   "dataset_name": "CDC BRFSS 2023 Annual Survey",
   "official_source": "https://www.cdc.gov/brfss/annual_data/annual_2023.html",
   "dataset_version": "2023",
-  "training_date": "2026-11-13T11:18:00Z",
+  "export_date": "2026-11-13T13:57:07Z",
   "total_usable_dataset_records": 397870,
-  "research_cohort_records": 30000,
-  "train_records": 24000,
-  "test_records": 6000,
+  "training_cohort_records": 318296,
+  "holdout_test_records": 79574,
   "test_split_fraction": 0.2,
   "random_seed": 42,
   "features": [
@@ -36,17 +35,27 @@
     "BingeDrinking",
     "MedCostObstacle"
   ],
-  "target_variable": "_MICHD (1: CHD or MI reported, 0: No report)",
+  "target_variable": "_MICHD (1: Reported CHD/MI, 0: Negative)",
   "target_leakage_excluded": [
     "CVDINFR4",
     "CVDCRHD4"
   ],
-  "best_algorithm": "logistic_regression",
-  "python_version": "3.12.8",
-  "dependencies": {
-    "scikit-learn": "1.9.1",
-    "xgboost": "3.4.1",
-    "lightgbm": "4.7.0",
-    "catboost": "1.2.10"
-  }
+  "selected_algorithm": "Logistic Regression",
+  "selected_hyperparameters": {
+    "C": 5.0,
+    "class_weight": "balanced",
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": 0.0,
+    "max_iter": 1000,
+    "n_jobs": null,
+    "penalty": "deprecated",
+    "random_state": 42,
+    "solver": "lbfgs",
+    "tol": 0.0001,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "python_version": "3.12.8 (tags/v3.12.8:2dc476b, Dec  3 2024, 19:30:04) [MSC v.1942 64 bit (AMD64)]"
 }

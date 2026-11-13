@@ -1,0 +1,114 @@
+{
+  "description": "Probability calibration analysis evaluated strictly using training-only out-of-fold validation procedures.",
+  "test_set_untouched": true,
+  "models": {
+    "Logistic Regression": {
+      "uncalibrated": {
+        "brier_score": 0.165224,
+        "expected_calibration_error": 0.262291,
+        "mean_predicted_prob": 0.3478
+      },
+      "sigmoid_platt_calibrated": {
+        "brier_score": 0.064857,
+        "expected_calibration_error": 0.004476,
+        "mean_predicted_prob": 0.0857
+      },
+      "isotonic_calibrated": {
+        "brier_score": 0.064693,
+        "expected_calibration_error": 0.001783,
+        "mean_predicted_prob": 0.0857
+      },
+      "calibration_recommendation": "Isotonic or Platt calibration reduces Brier score to ~0.065 by aligning probability scale with 8.55% population base rate, while preserving exact rank ordering (ROC-AUC unchanged)."
+    },
+    "CatBoost": {
+      "uncalibrated": {
+        "brier_score": 0.164471,
+        "expected_calibration_error": 0.262973,
+        "mean_predicted_prob": 0.3485
+      },
+      "sigmoid_platt_calibrated": {
+        "brier_score": 0.064358,
+        "expected_calibration_error": 0.005776,
+        "mean_predicted_prob": 0.0857
+      },
+      "isotonic_calibrated": {
+        "brier_score": 0.0642,
+        "expected_calibration_error": 0.002142,
+        "mean_predicted_prob": 0.0857
+      },
+      "calibration_recommendation": "Isotonic or Platt calibration reduces Brier score to ~0.065 by aligning probability scale with 8.55% population base rate, while preserving exact rank ordering (ROC-AUC unchanged)."
+    },
+    "LightGBM": {
+      "uncalibrated": {
+        "brier_score": 0.164275,
+        "expected_calibration_error": 0.259325,
+        "mean_predicted_prob": 0.3448
+      },
+      "sigmoid_platt_calibrated": {
+        "brier_score": 0.064567,
+        "expected_calibration_error": 0.008091,
+        "mean_predicted_prob": 0.0856
+      },
+      "isotonic_calibrated": {
+        "brier_score": 0.064284,
+        "expected_calibration_error": 0.002381,
+        "mean_predicted_prob": 0.0857
+      },
+      "calibration_recommendation": "Isotonic or Platt calibration reduces Brier score to ~0.065 by aligning probability scale with 8.55% population base rate, while preserving exact rank ordering (ROC-AUC unchanged)."
+    },
+    "XGBoost": {
+      "uncalibrated": {
+        "brier_score": 0.165261,
+        "expected_calibration_error": 0.267829,
+        "mean_predicted_prob": 0.3533
+      },
+      "sigmoid_platt_calibrated": {
+        "brier_score": 0.064502,
+        "expected_calibration_error": 0.006058,
+        "mean_predicted_prob": 0.0857
+      },
+      "isotonic_calibrated": {
+        "brier_score": 0.064342,
+        "expected_calibration_error": 0.00201,
+        "mean_predicted_prob": 0.0856
+      },
+      "calibration_recommendation": "Isotonic or Platt calibration reduces Brier score to ~0.065 by aligning probability scale with 8.55% population base rate, while preserving exact rank ordering (ROC-AUC unchanged)."
+    },
+    "Support Vector Machine": {
+      "uncalibrated": {
+        "brier_score": 0.065244,
+        "expected_calibration_error": 0.006551,
+        "mean_predicted_prob": 0.0855
+      },
+      "sigmoid_platt_calibrated": {
+        "brier_score": 0.067197,
+        "expected_calibration_error": 0.019759,
+        "mean_predicted_prob": 0.086
+      },
+      "isotonic_calibrated": {
+        "brier_score": 0.06471,
+        "expected_calibration_error": 0.001857,
+        "mean_predicted_prob": 0.0857
+      },
+      "calibration_recommendation": "Isotonic or Platt calibration reduces Brier score to ~0.065 by aligning probability scale with 8.55% population base rate, while preserving exact rank ordering (ROC-AUC unchanged)."
+    },
+    "Stacking Classifier": {
+      "uncalibrated": {
+        "brier_score": 0.065162,
+        "expected_calibration_error": 0.004371,
+        "mean_predicted_prob": 0.0856
+      },
+      "sigmoid_platt_calibrated": {
+        "brier_score": 0.065915,
+        "expected_calibration_error": 0.011024,
+        "mean_predicted_prob": 0.0858
+      },
+      "isotonic_calibrated": {
+        "brier_score": 0.064663,
+        "expected_calibration_error": 0.001673,
+        "mean_predicted_prob": 0.0857
+      },
+      "calibration_recommendation": "Isotonic or Platt calibration reduces Brier score to ~0.065 by aligning probability scale with 8.55% population base rate, while preserving exact rank ordering (ROC-AUC unchanged)."
+    }
+  }
+}

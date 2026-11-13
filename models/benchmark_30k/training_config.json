@@ -1,0 +1,52 @@
+{
+  "dataset_name": "CDC BRFSS 2023 Annual Survey",
+  "official_source": "https://www.cdc.gov/brfss/annual_data/annual_2023.html",
+  "dataset_version": "2023",
+  "training_date": "2026-11-13T11:18:00Z",
+  "total_usable_dataset_records": 397870,
+  "research_cohort_records": 30000,
+  "train_records": 24000,
+  "test_records": 6000,
+  "test_split_fraction": 0.2,
+  "random_seed": 42,
+  "features": [
+    "BMI",
+    "PhysicalHealthDays",
+    "MentalHealthDays",
+    "AgeCategory",
+    "BMICategory",
+    "Race",
+    "Education",
+    "Income",
+    "GeneralHealth",
+    "SmokerStatus",
+    "ECigStatus",
+    "Checkup",
+    "PersonalDoctor",
+    "Sex_Male",
+    "HighBP",
+    "HighCholesterol",
+    "StrokeHistory",
+    "Diabetes",
+    "KidneyDisease",
+    "Depression",
+    "Asthma",
+    "PhysicalActivity",
+    "AlcoholDrinking",
+    "BingeDrinking",
+    "MedCostObstacle"
+  ],
+  "target_variable": "_MICHD (1: CHD or MI reported, 0: No report)",
+  "target_leakage_excluded": [
+    "CVDINFR4",
+    "CVDCRHD4"
+  ],
+  "best_algorithm": "logistic_regression",
+  "python_version": "3.12.8",
+  "dependencies": {
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "lightgbm": "4.7.0",
+    "catboost": "1.2.10"
+  }
+}

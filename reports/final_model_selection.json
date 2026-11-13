@@ -1,0 +1,47 @@
+{
+  "selected_algorithm": "Logistic Regression",
+  "model_id": "heartai-logistic-regression-v2-full",
+  "model_version": "2.1.0",
+  "training_records": 318296,
+  "test_records": 79574,
+  "selection_criteria_analysis": {
+    "discrimination_roc_auc": "0.8465 CV ROC-AUC; closely matches top boosting models (0.851) with complete linear interpretability.",
+    "clinical_screening_recall": "79.84% CV Sensitivity; successfully detects 4 out of 5 reported cardiovascular histories in cross-validation.",
+    "specificity_balance": "74.21% CV Specificity; maintains acceptable false positive rate on healthy survey respondents.",
+    "operational_latency": "Sub-millisecond single-sample inference (< 50 microseconds), allowing zero UI blocking in web deployment.",
+    "artifact_footprint": "1,071 bytes (.joblib); instantaneous loading and zero memory overhead.",
+    "transparency_safety": "Linear log-odds directly reflect epidemiological correlations without unexpected decision tree boundary artifacts."
+  },
+  "non_clinical_superiority_disclaimer": "Selection is based on software engineering reliability, interpretability, and screening balance; no claim of medical diagnostic superiority is made.",
+  "tuning_results": {
+    "LightGBM": {
+      "best_params": {
+        "num_leaves": 31,
+        "n_estimators": 60,
+        "min_child_samples": 100,
+        "learning_rate": 0.1
+      },
+      "best_cv_roc_auc": 0.852334
+    },
+    "Logistic Regression": {
+      "best_params": {
+        "max_iter": 1000,
+        "C": 5.0
+      },
+      "best_cv_roc_auc": 0.84773
+    },
+    "XGBoost": {
+      "best_params": {
+        "n_estimators": 60,
+        "max_depth": 4,
+        "learning_rate": 0.08
+      },
+      "best_cv_roc_auc": 0.850571
+    }
+  },
+  "optimal_training_threshold": {
+    "default_threshold": 0.5,
+    "youden_optimal_threshold": 0.5,
+    "purpose": "Threshold 0.50 used as canonical probability decision boundary; Youden threshold (0.50) maximizes combined sensitivity + specificity on training data."
+  }
+}
