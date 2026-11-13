@@ -6,10 +6,20 @@ model metadata introspection, and automated Colab/Drive sync.
 
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException, status
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from contextlib import asynccontextmanager
 
+from fastapi import FastAPI, HTTPException, Request, Response, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+
+from app.api.routes import auth_router, health_router, model_info_router, predict_router
+from app.core.config import settings
+from app.core.rate_limit import limiter
+from app.db.session import init_db
 from app.ml import (
     ModelMetadata,
     PatientClinicalInput,
@@ -18,33 +28,93 @@ from app.ml import (
     registry,
     transfer_manager,
 )
+from app.services.model_service import model_service
 from logging_config import setup_logging
 
 logger = setup_logging("INFO")
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initializes database tables, ML artifacts, and registry on application startup."""
+    logger.info("Initializing HeartAI Platform Services (v%s)...", settings.VERSION)
+
+    # 1. Initialize Database
+    try:
+        init_db()
+    except Exception as exc:
+        logger.error("Database initialization failed: %s", exc)
+
+    # 2. Load and verify calibrated production model artifact
+    try:
+        model_service.load_artifacts()
+    except Exception as exc:
+        logger.error("Failed to load production model artifacts: %s", exc)
+
+    # 3. Maintain backward-compatible legacy registry
+    try:
+        count = registry.scan_and_register()
+        logger.info("HeartAI legacy registry scanned %d models.", count)
+    except Exception as exc:
+        logger.warning("Legacy registry scan warning: %s", exc)
+
+    logger.info("HeartAI API server startup complete. Listening on %s:%d", settings.APP_HOST, settings.APP_PORT)
+    yield
+    logger.info("HeartAI API server shutting down.")
+
+
 app = FastAPI(
     title="HeartAI — Clinical Intelligence API",
     description="Cardiovascular Disease Risk Prediction & Healthcare Telemetry Platform",
-    version="1.0.0",
+    version=settings.VERSION,
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
+
+# Attach rate limiter to application state
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS middleware for modern frontend integrations
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Static files for motion engine and styles
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.on_event("startup")
-def startup_event():
-    """Initializes ML model registry on server startup."""
-    count = registry.scan_and_register()
-    logger.info("HeartAI API server initialized with %d registered models.", count)
+
+# Global safe exception handler: prevents internal paths or stack traces leaking
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception) -> Response:
+    if isinstance(exc, HTTPException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail},
+            headers=getattr(exc, "headers", None),
+        )
+    logger.error("Unhandled server exception at %s: %s", request.url.path, exc, exc_info=True)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "An internal server error occurred. Telemetry has been logged."},
+    )
+
+
+# Mount Modular Production Routes
+app.include_router(health_router)
+app.include_router(model_info_router)
+app.include_router(predict_router)
+app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth")
+
+
+# ==============================================================================
+# Legacy Compatibility Routes (UCI Cleveland 13-feature baseline & Drive sync)
+# ==============================================================================
 
 
 @app.get("/", tags=["System Health"])
@@ -121,4 +191,4 @@ def sync_model_from_drive(request: DriveSyncRequest):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host=settings.APP_HOST, port=settings.APP_PORT, reload=settings.APP_DEBUG)

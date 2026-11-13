@@ -2,12 +2,15 @@
 
 Demonstrates all 6 animation categories implemented for HeartAI in NiceGUI.
 Does not alter the website's core design — serves as an architectural example.
+Integrates with the FastAPI backend (/predict) for calibrated inference.
 """
 
 from __future__ import annotations
 
 import random
+from typing import Any
 
+import httpx
 from nicegui import app, ui
 
 from motion import (
@@ -29,11 +32,107 @@ from motion import (
 # Register static routes
 register_motion_routes(app)
 
+BACKEND_API_URL = "http://localhost:8000"
+
 
 @ui.page("/")
 def index_page():
     # Inject Motion Styles & Scripts
     ui.add_head_html(get_motion_head_html(use_cdn=False))
+
+    # --- Assessment Modal Dialog for Backend Connection ---
+    with ui.dialog() as assessment_dialog, ui.card().classes(
+        "p-6 max-w-lg w-full rounded-2xl bg-white shadow-xl border border-slate-100"
+    ):
+        ui.label("Cardiovascular Survey Assessment").classes("text-xl font-bold text-slate-900 mb-1")
+        ui.label(
+            "Submits CDC BRFSS feature vector to the calibrated HeartAI backend for educational estimation."
+        ).classes("text-xs text-slate-500 mb-4")
+
+        with ui.column().classes("gap-3 w-full"):
+            with ui.row().classes("w-full justify-between items-center"):
+                ui.label("Age Bracket (1: 18-24 ... 13: 80+)").classes("text-sm text-slate-700")
+                age_cat = ui.number(value=10, min=1, max=13, step=1).classes("w-20")
+
+            with ui.row().classes("w-full justify-between items-center"):
+                ui.label("Body Mass Index (BMI)").classes("text-sm text-slate-700")
+                bmi_val = ui.number(value=28.5, min=12.0, max=80.0, step=0.1).classes("w-24")
+
+            with ui.row().classes("w-full justify-between items-center"):
+                ui.label("General Health (1: Excellent ... 5: Poor)").classes("text-sm text-slate-700")
+                gen_health = ui.number(value=3, min=1, max=5, step=1).classes("w-20")
+
+            with ui.row().classes("gap-4 w-full flex-wrap"):
+                bp_check = ui.checkbox("High Blood Pressure", value=True)
+                chol_check = ui.checkbox("High Cholesterol", value=True)
+                smoker_check = ui.checkbox("Current / Former Smoker", value=True)
+
+            consent_check = ui.checkbox(
+                "I consent to store anonymized telemetry for research",
+                value=True,
+            ).classes("text-xs text-teal-800 font-medium mt-2")
+
+            result_banner = ui.column().classes("w-full hidden mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200")
+
+            async def submit_assessment():
+                payload: dict[str, Any] = {
+                    "Sex_Male": 1,
+                    "AgeCategory": int(age_cat.value or 10),
+                    "BMI": float(bmi_val.value or 28.5),
+                    "BMICategory": 3,
+                    "Race": 1,
+                    "Education": 4,
+                    "Income": 7,
+                    "GeneralHealth": int(gen_health.value or 3),
+                    "PhysicalHealthDays": 4.0,
+                    "MentalHealthDays": 2.0,
+                    "HighBP": 1 if bp_check.value else 0,
+                    "HighCholesterol": 1 if chol_check.value else 0,
+                    "StrokeHistory": 0,
+                    "Diabetes": 0,
+                    "KidneyDisease": 0,
+                    "Depression": 0,
+                    "Asthma": 0,
+                    "SmokerStatus": 3 if smoker_check.value else 4,
+                    "ECigStatus": 4,
+                    "PhysicalActivity": 1,
+                    "AlcoholDrinking": 1,
+                    "BingeDrinking": 0,
+                    "Checkup": 1,
+                    "MedCostObstacle": 0,
+                    "PersonalDoctor": 1,
+                    "user_consent_given": bool(consent_check.value),
+                }
+                try:
+                    async with httpx.AsyncClient(timeout=5.0) as client:
+                        resp = await client.post(f"{BACKEND_API_URL}/predict", json=payload)
+                        if resp.status_code == 200:
+                            data = resp.json()
+                            result_banner.clear()
+                            result_banner.classes(remove="hidden")
+                            with result_banner:
+                                ui.label(
+                                    f"Estimated probability of reported historical cardiovascular disease: "
+                                    f"{data['estimated_probability_percentage']:.2f}%"
+                                ).classes("text-sm font-bold text-teal-900")
+                                flag_str = (
+                                    "Historical CVD Pattern Detected (prob >= 0.09)"
+                                    if data["binary_classification"] == 1
+                                    else "Baseline Survey Pattern (prob < 0.09)"
+                                )
+                                ui.label(f"Threshold Classification: {flag_str}").classes("text-xs text-slate-700")
+                                ui.label(data["educational_disclaimer"]).classes("text-xs text-slate-500 italic mt-1")
+                            ui.notify("Assessment inference successfully calculated", color="teal")
+                        else:
+                            ui.notify(f"Inference returned status {resp.status_code}", color="red")
+                except Exception as exc:
+                    ui.notify(f"Backend offline or unreachable ({exc}). Running local preview.", color="orange")
+
+            with ui.row().classes("w-full justify-end gap-3 mt-4"):
+                ui.button("Cancel", on_click=assessment_dialog.close).props("outline").classes("text-slate-600")
+                ui.button("Calculate Risk", on_click=submit_assessment).classes(
+                    "heartai-btn bg-teal-600 text-white rounded-lg px-4 py-2 font-medium"
+                )
 
     # 1. NAVIGATION
     with ui.header().classes("heartai-navbar w-full bg-white/80 fixed top-0 left-0 z-50 px-8 py-4 flex justify-between items-center"):
@@ -63,8 +162,12 @@ def index_page():
             ).classes("text-slate-600 text-lg mb-6 leading-relaxed")
 
             with ui.row().classes("gap-4 items-center"):
-                ui.button("Start Assessment", icon="arrow_forward").classes("heartai-btn bg-teal-600 text-white text-base px-6 py-3 rounded-xl shadow-lg")
-                ui.button("Explore Analytics", icon="insights").props("outline").classes("heartai-btn text-teal-700 border-teal-600 px-6 py-3 rounded-xl")
+                ui.button("Start Assessment", icon="arrow_forward", on_click=assessment_dialog.open).classes(
+                    "heartai-btn bg-teal-600 text-white text-base px-6 py-3 rounded-xl shadow-lg"
+                )
+                ui.button("Explore Analytics", icon="insights").props("outline").classes(
+                    "heartai-btn text-teal-700 border-teal-600 px-6 py-3 rounded-xl"
+                )
 
             with ui.column().classes("mt-8 w-full max-w-md"):
                 ui.label("Live Isoelectric Rhythm Monitor").classes("text-xs font-semibold text-teal-800 uppercase tracking-wider")
@@ -119,11 +222,69 @@ def index_page():
             with ui.card().classes("bg-white p-8 rounded-2xl border border-slate-100 shadow-sm w-full flex flex-col md:flex-row items-center justify-around gap-8"):
                 with ui.column().classes("items-center text-center"):
                     ui.label("Patient Risk Categorization").classes("text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2")
-                    ui.html(render_risk_gauge_svg(risk_score_percent=24, risk_category="Optimal Hemodynamics", width=260, height=140))
+                    gauge_slot = ui.element("div")
+                    with gauge_slot:
+                        ui.html(render_risk_gauge_svg(risk_score_percent=19, risk_category="Optimal Hemodynamics", width=260, height=140))
                 with ui.column().classes("flex-1"):
                     ui.label("Risk Trajectory Analysis").classes("text-lg font-bold text-slate-900 mb-2")
-                    ui.label("Patient baseline indicates a 24% cumulative 5-year cardiovascular event probability, placing them firmly within the lowest clinical quintile under Framingham parameters.").classes("text-slate-600 text-sm leading-relaxed mb-4")
-                    ui.button("Generate Detailed Diagnostic Report", icon="description").classes("heartai-btn bg-teal-600 text-white text-sm px-4 py-2 rounded-lg")
+                    analysis_text = ui.label(
+                        "Patient survey baseline indicates an estimated probability of reported "
+                        "historical cardiovascular disease of 18.98%, evaluated using calibrated BRFSS ensemble. "
+                        "Educational research estimate; not a clinical diagnostic device."
+                    ).classes("text-slate-600 text-sm leading-relaxed mb-4")
+
+                    async def generate_diagnostic_report():
+                        payload: dict[str, Any] = {
+                            "Sex_Male": 1,
+                            "AgeCategory": 10,
+                            "BMI": 28.5,
+                            "BMICategory": 3,
+                            "Race": 1,
+                            "Education": 4,
+                            "Income": 7,
+                            "GeneralHealth": 3,
+                            "PhysicalHealthDays": 4.0,
+                            "MentalHealthDays": 2.0,
+                            "HighBP": 1,
+                            "HighCholesterol": 1,
+                            "StrokeHistory": 0,
+                            "Diabetes": 0,
+                            "KidneyDisease": 0,
+                            "Depression": 0,
+                            "Asthma": 0,
+                            "SmokerStatus": 3,
+                            "ECigStatus": 4,
+                            "PhysicalActivity": 1,
+                            "AlcoholDrinking": 1,
+                            "BingeDrinking": 0,
+                            "Checkup": 1,
+                            "MedCostObstacle": 0,
+                            "PersonalDoctor": 1,
+                            "user_consent_given": True,
+                        }
+                        try:
+                            async with httpx.AsyncClient(timeout=5.0) as client:
+                                resp = await client.post(f"{BACKEND_API_URL}/predict", json=payload)
+                                if resp.status_code == 200:
+                                    data = resp.json()
+                                    pct = data["estimated_probability_percentage"]
+                                    flag = data["binary_classification"]
+                                    flag_label = "Pattern Detected" if flag == 1 else "Normal Baseline"
+                                    gauge_slot.clear()
+                                    with gauge_slot:
+                                        ui.html(render_risk_gauge_svg(risk_score_percent=int(pct), risk_category=flag_label, width=260, height=140))
+                                    analysis_text.text = (
+                                        f"Estimated probability of reported historical cardiovascular disease: "
+                                        f"{pct:.2f}% (Operating Threshold: {data['operating_threshold']}, Classification: {flag_label}). "
+                                        f"{data['educational_disclaimer']}"
+                                    )
+                                    ui.notify(f"Telemetry refreshed from backend: {pct:.2f}%", color="teal")
+                        except Exception as err:
+                            ui.notify(f"Backend telemetry call notice: {err}", color="orange")
+
+                    ui.button("Generate Detailed Diagnostic Report", icon="description", on_click=generate_diagnostic_report).classes(
+                        "heartai-btn bg-teal-600 text-white text-sm px-4 py-2 rounded-lg"
+                    )
 
     # 5. HEALTH METRICS SECTION
     with ui.element("section").props('id="metrics"').classes("py-20 px-8 max-w-6xl mx-auto"):
