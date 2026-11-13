@@ -1,0 +1,252 @@
+{
+  "verification_timestamp": "2026-11-13T13:32:24Z",
+  "environment": {
+    "python_version": "3.12.8 (tags/v3.12.8:2dc476b, Dec  3 2024, 19:30:04) [MSC v.1942 64 bit (AMD64)]",
+    "platform": "win32",
+    "colab_dependency": false,
+    "standalone_local_execution": true
+  },
+  "artifacts_checked": 21,
+  "artifacts": [
+    {
+      "filename": "best_model.joblib",
+      "exists": true,
+      "size_bytes": 1071,
+      "sha256": "03a3dc17bb69fcb065b7722cb3fbea8ba43aa368273737a2af84cf5f1407dd1b",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.6414,
+        "class": 1
+      }
+    },
+    {
+      "filename": "logistic_regression.joblib",
+      "exists": true,
+      "size_bytes": 1071,
+      "sha256": "03a3dc17bb69fcb065b7722cb3fbea8ba43aa368273737a2af84cf5f1407dd1b",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.6414,
+        "class": 1
+      }
+    },
+    {
+      "filename": "catboost.joblib",
+      "exists": true,
+      "size_bytes": 66645,
+      "sha256": "df5c70580096be0b93f9d44a1eff07d8b11e7f2fb052158e536de3e29c5765e0",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.6705,
+        "class": 1
+      }
+    },
+    {
+      "filename": "xgboost.joblib",
+      "exists": true,
+      "size_bytes": 144120,
+      "sha256": "420107e43c8117244a61eccff724fb2203a7c88a2f6d8d716835dd4fe5bec93a",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.7389,
+        "class": 1
+      }
+    },
+    {
+      "filename": "lightgbm.joblib",
+      "exists": true,
+      "size_bytes": 282180,
+      "sha256": "e903c838a9c95b13f75420cf64d02d4464e1e1cec7a49eb1f07e43c8e1567e71",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.7684,
+        "class": 1
+      }
+    },
+    {
+      "filename": "random_forest.joblib",
+      "exists": true,
+      "size_bytes": 3261833,
+      "sha256": "c4c11ad342f5724480cd29ceaf48056906f4d27b73f27671c552691d525a633d",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.7118,
+        "class": 1
+      }
+    },
+    {
+      "filename": "extra_trees.joblib",
+      "exists": true,
+      "size_bytes": 3296217,
+      "sha256": "25f998f59a709a4ee318b898291151412890a9c0d3b3d9712ff62919c1fc05a1",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.6464,
+        "class": 1
+      }
+    },
+    {
+      "filename": "enriched_random_forest.joblib",
+      "exists": true,
+      "size_bytes": 1907347,
+      "sha256": "9d709f8e4054a8aa60f152a4ed7526fd95fa7f1096c86b723ddfb5ccdbc75eed",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.1794,
+        "class": 0
+      }
+    },
+    {
+      "filename": "tree_weighted_random_forest.joblib",
+      "exists": true,
+      "size_bytes": 1904051,
+      "sha256": "24adc3f5c3158a3129b9b0c061160c009ef4c7ad12cd471fc22fd1da4a9153b7",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.1408,
+        "class": 0
+      }
+    },
+    {
+      "filename": "adaboost.joblib",
+      "exists": true,
+      "size_bytes": 52580,
+      "sha256": "7958be24ecbe3fe532414a3ddfcea677d395bc7afa14ff9023ece3b92e8ebc64",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.2904,
+        "class": 0
+      }
+    },
+    {
+      "filename": "gradient_boosting.joblib",
+      "exists": true,
+      "size_bytes": 207414,
+      "sha256": "a776c39fcd1ca1692cce0f50e049548c1e38d096c208acdbf40930a02872e880",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.1848,
+        "class": 0
+      }
+    },
+    {
+      "filename": "decision_tree.joblib",
+      "exists": true,
+      "size_bytes": 11289,
+      "sha256": "92e2f54d06383f72c888538ee23b3fc087dc78bb073171c3867e4970a8082176",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.8074,
+        "class": 1
+      }
+    },
+    {
+      "filename": "entropy_decision_tree.joblib",
+      "exists": true,
+      "size_bytes": 11129,
+      "sha256": "8f55bbc13e655cf8b32b9ec772181a35523c9fd84656a0bae43bf2c62cdba5ec",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.7197,
+        "class": 1
+      }
+    },
+    {
+      "filename": "support_vector_machine.joblib",
+      "exists": true,
+      "size_bytes": 2756,
+      "sha256": "64c474c24bdcf7c1bfb4ee872763b3aaa07fafc6c090ac6bf8a0f2e85622f6de",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.1418,
+        "class": 0
+      }
+    },
+    {
+      "filename": "stacking_model.joblib",
+      "exists": true,
+      "size_bytes": 778484,
+      "sha256": "657a9921647eb1d23a271532643a1045e1090de6cfa08dbdf3c0ff5afc1043b3",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS",
+      "sample_prediction": {
+        "estimated_probability": 0.1696,
+        "class": 0
+      }
+    },
+    {
+      "filename": "preprocessing_pipeline.joblib",
+      "exists": true,
+      "size_bytes": 4362,
+      "sha256": "b2f06fe4f630e64a512bae7eec3f326ef9088a2c0145e3d9a6e0a40d29234f6f",
+      "load_status": "SUCCESS",
+      "predict_status": "SUCCESS (TRANSFORMER)",
+      "sample_prediction": {
+        "transformed_shape": [
+          1,
+          25
+        ]
+      }
+    },
+    {
+      "filename": "model_metadata.json",
+      "exists": true,
+      "size_bytes": 824,
+      "sha256": "1208d35d169dc91258de249266071d4d1ba29054ab69e619e1cbc936252c2f5d",
+      "load_status": "SUCCESS (VALID_JSON)",
+      "predict_status": "N/A (METADATA)",
+      "sample_prediction": null
+    },
+    {
+      "filename": "feature_names.json",
+      "exists": true,
+      "size_bytes": 450,
+      "sha256": "4afde69394bb06e07c31c1f2af66f8d62d995278a7cd31951074d223865f2e06",
+      "load_status": "SUCCESS (VALID_JSON)",
+      "predict_status": "N/A (METADATA)",
+      "sample_prediction": null
+    },
+    {
+      "filename": "training_config.json",
+      "exists": true,
+      "size_bytes": 1262,
+      "sha256": "04d63dc79b258f7d2f5d49526fc67b9bdb2ab7320c28d11d2792a45ca725b02a",
+      "load_status": "SUCCESS (VALID_JSON)",
+      "predict_status": "N/A (METADATA)",
+      "sample_prediction": null
+    },
+    {
+      "filename": "model_comparison.csv",
+      "exists": true,
+      "size_bytes": 1761,
+      "sha256": "7289e2343d3be57824dc77f27009cfd0e8e93bee043f2f538f93edfb8666eb45",
+      "load_status": "SUCCESS (VALID_CSV)",
+      "predict_status": "N/A (TABULAR_DATA)",
+      "sample_prediction": null
+    },
+    {
+      "filename": "evaluation_report.json",
+      "exists": true,
+      "size_bytes": 12362,
+      "sha256": "bebf8c7243abd35d90b1cca4f6fe3eadb701ab2ff5685513e0e41674d17b1635",
+      "load_status": "SUCCESS (VALID_JSON)",
+      "predict_status": "N/A (METADATA)",
+      "sample_prediction": null
+    }
+  ],
+  "all_artifacts_intact_and_functional": true
+}

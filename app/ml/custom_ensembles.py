@@ -34,6 +34,7 @@ class EnrichedRandomForestClassifier(BaseEstimator, ClassifierMixin):
         min_samples_leaf: int = 1,
         max_features: float = 0.5,
         relevance_temperature: float = 1.0,
+        class_weight: str | dict | None = None,
         random_state: int | None = 42,
     ):
         self.n_estimators = n_estimators
@@ -42,6 +43,7 @@ class EnrichedRandomForestClassifier(BaseEstimator, ClassifierMixin):
         self.min_samples_leaf = min_samples_leaf
         self.max_features = max_features
         self.relevance_temperature = relevance_temperature
+        self.class_weight = class_weight
         self.random_state = random_state
 
         self.estimators_: list[DecisionTreeClassifier] = []
@@ -103,6 +105,7 @@ class EnrichedRandomForestClassifier(BaseEstimator, ClassifierMixin):
                 max_depth=self.max_depth,
                 min_samples_split=self.min_samples_split,
                 min_samples_leaf=self.min_samples_leaf,
+                class_weight=self.class_weight,
                 random_state=tree_seed,
             )
             tree.fit(X_boot, y_boot)
@@ -152,6 +155,7 @@ class TreeWeightedRandomForestClassifier(BaseEstimator, ClassifierMixin):
         min_samples_split: int = 2,
         min_samples_leaf: int = 1,
         max_features: str | float = "sqrt",
+        class_weight: str | dict | None = None,
         random_state: int | None = 42,
     ):
         self.n_estimators = n_estimators
@@ -159,6 +163,7 @@ class TreeWeightedRandomForestClassifier(BaseEstimator, ClassifierMixin):
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.max_features = max_features
+        self.class_weight = class_weight
         self.random_state = random_state
 
         self.estimators_: list[DecisionTreeClassifier] = []
@@ -190,6 +195,7 @@ class TreeWeightedRandomForestClassifier(BaseEstimator, ClassifierMixin):
                 min_samples_split=self.min_samples_split,
                 min_samples_leaf=self.min_samples_leaf,
                 max_features=self.max_features,
+                class_weight=self.class_weight,
                 random_state=tree_seed,
             )
             tree.fit(X_arr[boot_idx], y_arr[boot_idx])
@@ -198,7 +204,16 @@ class TreeWeightedRandomForestClassifier(BaseEstimator, ClassifierMixin):
             # Evaluate tree on out-of-bag sample strictly
             if len(oob_idx) > 0:
                 oob_preds = tree.predict(X_arr[oob_idx])
-                oob_acc = np.mean(oob_preds == y_arr[oob_idx])
+                y_oob = y_arr[oob_idx]
+                if self.class_weight == "balanced" and len(np.unique(y_oob)) > 1:
+                    # Balanced accuracy avoids rewarding degenerate majority-class trees
+                    pos_mask = y_oob == 1
+                    neg_mask = y_oob == 0
+                    sens = np.mean(oob_preds[pos_mask] == 1) if np.any(pos_mask) else 0.5
+                    spec = np.mean(oob_preds[neg_mask] == 0) if np.any(neg_mask) else 0.5
+                    oob_acc = float(0.5 * (sens + spec))
+                else:
+                    oob_acc = float(np.mean(oob_preds == y_oob))
             else:
                 oob_acc = 0.5  # Neutral fallback
 

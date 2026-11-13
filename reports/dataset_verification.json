@@ -1,0 +1,83 @@
+{
+  "dataset_name": "CDC BRFSS 2023 Annual Survey",
+  "official_source": "https://www.cdc.gov/brfss/annual_data/annual_2023.html",
+  "raw_xpt_file": "data/raw/LLCP2023.XPT",
+  "raw_xpt_size_bytes": 1205554400,
+  "total_raw_records": 433323,
+  "total_usable_records": 397870,
+  "class_distribution": {
+    "negative_class_0": 363847,
+    "positive_class_1": 34023,
+    "prevalence_pct": 8.55
+  },
+  "target_variable": "_MICHD (Extracted as binary HeartDisease: 1=Yes, 0=No)",
+  "target_leakage_prevention": {
+    "source_variables_excluded": [
+      "CVDINFR4",
+      "CVDCRHD4"
+    ],
+    "leakage_verified": true
+  },
+  "total_features": 25,
+  "features": [
+    "BMI",
+    "PhysicalHealthDays",
+    "MentalHealthDays",
+    "AgeCategory",
+    "BMICategory",
+    "Race",
+    "Education",
+    "Income",
+    "GeneralHealth",
+    "SmokerStatus",
+    "ECigStatus",
+    "Checkup",
+    "PersonalDoctor",
+    "Sex_Male",
+    "HighBP",
+    "HighCholesterol",
+    "StrokeHistory",
+    "Diabetes",
+    "KidneyDisease",
+    "Depression",
+    "Asthma",
+    "PhysicalActivity",
+    "AlcoholDrinking",
+    "BingeDrinking",
+    "MedCostObstacle"
+  ],
+  "missing_values_by_feature": {
+    "AgeCategory": 3788,
+    "BMI": 19069,
+    "BMICategory": 18996,
+    "Race": 6291,
+    "Education": 807,
+    "Income": 64076,
+    "GeneralHealth": 739,
+    "PhysicalHealthDays": 7612,
+    "MentalHealthDays": 5434,
+    "HighBP": 1019,
+    "HighCholesterol": 45780,
+    "StrokeHistory": 810,
+    "Diabetes": 479,
+    "KidneyDisease": 1209,
+    "Depression": 1611,
+    "Asthma": 1089,
+    "SmokerStatus": 2189,
+    "ECigStatus": 1838,
+    "PhysicalActivity": 744,
+    "AlcoholDrinking": 6355,
+    "BingeDrinking": 9327,
+    "Checkup": 3724,
+    "MedCostObstacle": 898,
+    "PersonalDoctor": 2851
+  },
+  "split_configuration": {
+    "train_fraction": 0.8,
+    "test_fraction": 0.2,
+    "train_records": 318296,
+    "test_records": 79574,
+    "stratified": true,
+    "random_state": 42
+  }
+}

@@ -232,12 +232,27 @@ def predict_heart_disease(
 
 
 class EducationalPredictionResponse(BaseModel):
-    """Structured educational cardiovascular risk estimate matching Step 13 requirements."""
+    """Structured educational cardiovascular estimate matching verified non-diagnostic schema."""
 
     model_name: str = Field(..., description="Name of the selected machine learning model")
     model_version: str = Field("2.0.0", description="Model semantic version")
-    prediction: int = Field(..., description="Binary estimate: 1 = Reported MI/CHD pattern, 0 = Negative")
-    estimated_probability: float = Field(..., ge=0.0, le=1.0, description="Continuous model output probability")
+    prediction: int = Field(..., description="Binary estimate: 1 = Reported historical MI/CHD pattern, 0 = Negative")
+    estimated_probability: float = Field(
+        ...,
+        ge=0.0,
+        le=1.0,
+        description="Estimated probability of reported historical cardiovascular disease",
+    )
+    estimated_probability_percentage: float = Field(
+        ...,
+        ge=0.0,
+        le=100.0,
+        description="Estimated percentage of reported historical cardiovascular disease",
+    )
+    metric_label: str = Field(
+        "Estimated probability of reported historical cardiovascular disease",
+        description="Scientific metric definition: historical self-reported status, not future event risk",
+    )
     output_type: str = Field("educational_estimate", description="Explicit indicator of non-clinical purpose")
     clinical_validation: bool = Field(False, description="Always False: educational research prototype")
     limitations: list[str] = Field(default_factory=list, description="Documented epidemiological and methodological caveats")
@@ -318,6 +333,8 @@ def predict_educational_estimate(
         model_version="2.0.0",
         prediction=pred,
         estimated_probability=round(prob, 4),
+        estimated_probability_percentage=round(prob * 100.0, 2),
+        metric_label="Estimated probability of reported historical cardiovascular disease",
         output_type="educational_estimate",
         clinical_validation=False,
         limitations=STANDARD_RESEARCH_LIMITATIONS,

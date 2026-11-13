@@ -118,3 +118,4 @@ def prepare_feature_dataframe(raw_dict: dict[str, any]) -> pd.DataFrame:
     for feat in ALL_INPUT_FEATURES:
         row[feat] = raw_dict.get(feat, np.nan)
     return pd.DataFrame([row])
+

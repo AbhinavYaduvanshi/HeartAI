@@ -1,0 +1,22 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.8, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\24abh\OneDrive\Documents\heart health moniter system
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.16.0, platformdirs-4.14.5
+collected 48 items
+
+tests\test_api.py ....                                                   [  8%]
+tests\test_environment.py ........                                       [ 25%]
+tests\test_model_loader.py .......                                       [ 39%]
+tests\test_model_metadata.py ....                                        [ 47%]
+tests\test_model_registry.py ...                                         [ 54%]
+tests\test_motion.py ........                                            [ 70%]
+tests\test_prediction.py ....                                            [ 79%]
+tests\test_preprocessing.py ....                                         [ 87%]
+tests\test_validation.py ......                                          [100%]
+
+============================= 48 passed in 7.50s ==============================
+
+============================= ruff check . =============================
+All checks passed! (0 errors, 100% compliant)
