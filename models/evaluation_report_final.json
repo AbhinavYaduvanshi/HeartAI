@@ -1,73 +1,173 @@
 {
-  "evaluation_timestamp": "2026-11-13T13:57:07Z",
+  "evaluation_timestamp": "2026-11-13T14:33:34Z",
+  "model_id": "heartai-logistic-regression-calibrated-v2",
+  "calibration_status": "CalibratedClassifierCV(method='isotonic', cv=5)",
   "test_dataset_records": 79574,
   "test_positives": 6805,
   "test_negatives": 72769,
   "test_prevalence_pct": 8.55,
-  "evaluation_status": "Evaluated exactly once on held-out test split.",
-  "unweighted_metrics": {
-    "accuracy": 0.7469,
-    "balanced_accuracy": 0.7702,
-    "precision": 0.2245,
-    "recall_sensitivity": 0.7982,
-    "specificity": 0.7421,
+  "uncalibrated_comparison": {
+    "accuracy": 0.9159,
+    "balanced_accuracy": 0.5403,
+    "precision": 0.5527,
+    "recall_sensitivity": 0.0871,
+    "specificity": 0.9934,
+    "f1_score": 0.1505,
+    "roc_auc": 0.846428,
+    "pr_auc": 0.3453,
+    "brier_score": 0.06538,
+    "confusion_matrix": {
+      "tn": 72289,
+      "fp": 480,
+      "fn": 6212,
+      "tp": 593
+    }
+  },
+  "calibrated_test_metrics_unweighted": {
+    "accuracy": 0.7476,
+    "balanced_accuracy": 0.7695,
+    "precision": 0.2246,
+    "recall_sensitivity": 0.796,
+    "specificity": 0.743,
     "f1_score": 0.3504,
-    "roc_auc": 0.84645,
-    "pr_auc": 0.3452,
-    "brier_score": 0.166403,
+    "roc_auc": 0.846428,
+    "pr_auc": 0.3453,
+    "brier_score": 0.06538,
     "confusion_matrix": {
-      "tn": 54003,
-      "fp": 18766,
-      "fn": 1373,
-      "tp": 5432
+      "tn": 54069,
+      "fp": 18700,
+      "fn": 1388,
+      "tp": 5417
     }
   },
-  "survey_weighted_descriptive_metrics": {
-    "accuracy": 0.81,
-    "balanced_accuracy": 0.7949,
-    "precision": 0.2276,
-    "recall_sensitivity": 0.7775,
-    "specificity": 0.7421,
+  "calibrated_test_metrics_survey_weighted": {
+    "accuracy": 0.8103,
+    "balanced_accuracy": 0.7945,
+    "precision": 0.2277,
+    "recall_sensitivity": 0.7763,
+    "specificity": 0.743,
     "f1_score": 0.3521,
-    "roc_auc": 0.874598,
-    "pr_auc": 0.3362,
-    "brier_score": 0.128907,
+    "roc_auc": 0.874567,
+    "pr_auc": 0.3365,
+    "brier_score": 0.05121,
     "confusion_matrix": {
-      "tn": 54003,
-      "fp": 18766,
-      "fn": 1373,
-      "tp": 5432
+      "tn": 54069,
+      "fp": 18700,
+      "fn": 1388,
+      "tp": 5417
     }
   },
-  "survey_weight_audit": {
-    "survey_name": "CDC Behavioral Risk Factor Surveillance System (BRFSS) 2023",
-    "sampling_design": "Complex multi-stage stratified cluster sampling",
-    "variables_inspected": {
-      "_LLCPWT": {
-        "name": "Final landline and cellular combined sample weight",
-        "purpose": "Post-stratification raking weight adjusting for unequal selection probability and demographic non-response.",
-        "mean": 576.89,
-        "std": 1170.39,
-        "min": 0.1591,
-        "max": 69785.82
-      },
-      "_STSTR": {
-        "name": "Sample design stratification variable",
-        "purpose": "Geographic and density strata within states to ensure coverage and reduce sampling variance.",
-        "status_in_raw_xpt": "Verified present in raw SAS transport file."
-      },
-      "_PSU": {
-        "name": "Primary Sampling Unit",
-        "purpose": "Cluster variable (telephone block clusters) used to compute complex design effects and standard errors.",
-        "status_in_raw_xpt": "Verified present in raw SAS transport file."
-      }
+  "optimal_screening_threshold": 0.09,
+  "threshold_grid_search_training": [
+    {
+      "threshold": 0.04,
+      "sensitivity": 0.918,
+      "specificity": 0.583,
+      "youden_j": 0.5009
     },
-    "methodological_limitations": [
-      "Supervised ML algorithms assume observations are independently and identically distributed (i.i.d.).",
-      "Complex survey designs exhibit clustering (_PSU) and stratification (_STSTR), producing non-i.i.d. correlation structures.",
-      "Sample-weighted loss functions optimize for pseudo-population totals but standard errors from scikit-learn do not reflect design variance without Taylor series linearization or balanced repeated replication.",
-      "Individual user predictions in web deployment do not possess survey weights; inference estimates conditional probability P(Y=1 | X=x) for the specific patient profile.",
-      "Unweighted empirical metrics and weighted descriptive metrics must be reported separately; weighted metrics estimate population-level association, not guaranteed individual clinical diagnostic accuracy."
-    ]
+    {
+      "threshold": 0.05,
+      "sensitivity": 0.8972,
+      "specificity": 0.622,
+      "youden_j": 0.5192
+    },
+    {
+      "threshold": 0.06,
+      "sensitivity": 0.8736,
+      "specificity": 0.66,
+      "youden_j": 0.5336
+    },
+    {
+      "threshold": 0.07,
+      "sensitivity": 0.8508,
+      "specificity": 0.6918,
+      "youden_j": 0.5426
+    },
+    {
+      "threshold": 0.08,
+      "sensitivity": 0.8299,
+      "specificity": 0.7142,
+      "youden_j": 0.5441
+    },
+    {
+      "threshold": 0.09,
+      "sensitivity": 0.8001,
+      "specificity": 0.7451,
+      "youden_j": 0.5451
+    },
+    {
+      "threshold": 0.1,
+      "sensitivity": 0.7914,
+      "specificity": 0.7526,
+      "youden_j": 0.544
+    },
+    {
+      "threshold": 0.11,
+      "sensitivity": 0.778,
+      "specificity": 0.763,
+      "youden_j": 0.541
+    },
+    {
+      "threshold": 0.12,
+      "sensitivity": 0.743,
+      "specificity": 0.7884,
+      "youden_j": 0.5314
+    },
+    {
+      "threshold": 0.13,
+      "sensitivity": 0.7102,
+      "specificity": 0.8102,
+      "youden_j": 0.5204
+    },
+    {
+      "threshold": 0.14,
+      "sensitivity": 0.673,
+      "specificity": 0.8323,
+      "youden_j": 0.5054
+    },
+    {
+      "threshold": 0.15,
+      "sensitivity": 0.6579,
+      "specificity": 0.8413,
+      "youden_j": 0.4991
+    },
+    {
+      "threshold": 0.16,
+      "sensitivity": 0.6419,
+      "specificity": 0.8485,
+      "youden_j": 0.4904
+    },
+    {
+      "threshold": 0.17,
+      "sensitivity": 0.6248,
+      "specificity": 0.8573,
+      "youden_j": 0.4821
+    },
+    {
+      "threshold": 0.18,
+      "sensitivity": 0.5976,
+      "specificity": 0.8688,
+      "youden_j": 0.4663
+    },
+    {
+      "threshold": 0.19,
+      "sensitivity": 0.5537,
+      "specificity": 0.8871,
+      "youden_j": 0.4407
+    }
+  ],
+  "latency_audit": {
+    "iterations": 2000,
+    "warmup_runs": 100,
+    "mean_latency_us": 2584.75,
+    "median_latency_us (P50)": 2504.9,
+    "p90_latency_us": 3135.26,
+    "p95_latency_us": 3356.72,
+    "p99_latency_us": 3841.04,
+    "mean_latency_ms": 2.5847,
+    "median_latency_ms (P50)": 2.5049,
+    "p90_latency_ms": 3.1353,
+    "p95_latency_ms": 3.3567,
+    "p99_latency_ms": 3.841
   }
 }

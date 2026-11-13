@@ -1,44 +1,54 @@
 {
-  "model_id": "heartai-logistic-regression-v2-full",
-  "model_name": "HeartAI BRFSS Research Classifier (Logistic Regression)",
+  "model_id": "heartai-logistic-regression-calibrated-v2",
+  "model_name": "HeartAI BRFSS Research Classifier (Calibrated Logistic Regression)",
   "version": "2.1.0",
-  "architecture": "logistic_regression",
+  "architecture": "CalibratedClassifierCV(LogisticRegression, method='isotonic', cv=5)",
   "artifact_format": "joblib",
   "artifact_filename": "best_model.joblib",
-  "sha256_checksum": "f956400429beab6bed4c77263b45cb9d4d7c701d2db1720ec423df9730b23fb5",
+  "sha256_checksum": "5dc415201016ed1223fd1f4c9cb295e14b2dd64639ad507d63efb16bed51f890",
+  "calibration": {
+    "is_calibrated": true,
+    "method": "isotonic",
+    "cv_folds": 5,
+    "uncalibrated_brier_score": 0.06538,
+    "calibrated_brier_score": 0.06538,
+    "brier_score_reduction_pct": 0.0,
+    "optimal_screening_threshold": 0.09
+  },
   "training_records": 318296,
   "test_records": 79574,
   "dataset_source": "CDC BRFSS 2023 (N=397,870 usable records)",
   "target_definition": "Estimated probability of reported historical cardiovascular disease (_MICHD: 1=Yes, 0=No)",
   "metrics": {
-    "accuracy": 0.7469,
-    "balanced_accuracy": 0.7702,
-    "precision": 0.2245,
-    "recall_sensitivity": 0.7982,
-    "specificity": 0.7421,
+    "accuracy": 0.7476,
+    "balanced_accuracy": 0.7695,
+    "precision": 0.2246,
+    "recall_sensitivity": 0.796,
+    "specificity": 0.743,
     "f1_score": 0.3504,
-    "roc_auc": 0.84645,
-    "pr_auc": 0.3452,
-    "brier_score": 0.166403
+    "roc_auc": 0.846428,
+    "pr_auc": 0.3453,
+    "brier_score": 0.06538
   },
   "weighted_metrics": {
-    "weighted_roc_auc": 0.874598,
-    "weighted_recall": 0.7775,
-    "weighted_specificity": 0.7421
+    "weighted_roc_auc": 0.874567,
+    "weighted_recall": 0.7763,
+    "weighted_specificity": 0.743
   },
   "latency_benchmark": {
     "iterations": 2000,
     "warmup_runs": 100,
-    "mean_latency_us": 141.63,
-    "median_latency_us (P50)": 124.15,
-    "p90_latency_us": 242.51,
-    "p95_latency_us": 288.42,
-    "p99_latency_us": 388.44,
-    "mean_latency_ms": 0.1416,
-    "median_latency_ms (P50)": 0.1241,
-    "p90_latency_ms": 0.2425,
-    "p99_latency_ms": 0.3884
+    "mean_latency_us": 2584.75,
+    "median_latency_us (P50)": 2504.9,
+    "p90_latency_us": 3135.26,
+    "p95_latency_us": 3356.72,
+    "p99_latency_us": 3841.04,
+    "mean_latency_ms": 2.5847,
+    "median_latency_ms (P50)": 2.5049,
+    "p90_latency_ms": 3.1353,
+    "p95_latency_ms": 3.3567,
+    "p99_latency_ms": 3.841
   },
   "is_active_production": true,
-  "educational_disclaimer": "Educational research estimate; not a clinical diagnostic device. Evaluates self-reported historical survey patterns, not 10-year incident cardiovascular events."
+  "educational_disclaimer": "Educational research estimate; not a clinical diagnostic device. Evaluates self-reported historical survey patterns, not future incident cardiovascular events."
 }
