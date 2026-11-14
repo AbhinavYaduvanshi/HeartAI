@@ -88,6 +88,28 @@ class Settings(BaseSettings):
     # Consent Policy Version
     CURRENT_CONSENT_TERMS_VERSION: str = "2026.1"
 
+    # Google Gemini Generative AI Configuration
+    GEMINI_API_KEY: str | None = Field(
+        None,
+        description="Google Gemini API key for clinical AI assistant and educational features.",
+    )
+    GEMINI_MODEL: str = Field(
+        "gemini-3.8-flash",
+        description="Supported Gemini model identifier (e.g. gemini-3.8-flash, gemini-3.5-flash-lite).",
+    )
+    GEMINI_TIMEOUT_SECONDS: float = Field(
+        15.0,
+        description="HTTP request timeout for Gemini API calls in seconds.",
+    )
+    GEMINI_MAX_OUTPUT_TOKENS: int = Field(
+        1024,
+        description="Maximum generation token budget for structured educational content.",
+    )
+    GEMINI_TEMPERATURE: float = Field(
+        0.2,
+        description="Temperature for clinical and educational response grounding.",
+    )
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

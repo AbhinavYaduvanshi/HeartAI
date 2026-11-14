@@ -13,6 +13,7 @@ from typing import Any
 import httpx
 from nicegui import app, ui
 
+from app.schemas.ai import AIChatRequest
 from motion import (
     get_init_analytics_js,
     get_init_doctor_banner_js,
@@ -127,6 +128,17 @@ def index_page():
                                 )
                                 ui.label(f"Threshold Classification: {flag_str}").classes("text-xs text-slate-700")
                                 ui.label(data["educational_disclaimer"]).classes("text-xs text-slate-500 italic mt-1")
+
+                                def explain_in_ai():
+                                    assessment_dialog.close()
+                                    open_ai_with_prompt(
+                                        f"Please explain my HeartAI cardiovascular risk estimate: {data['estimated_probability_percentage']:.2f}% "
+                                        f"estimated probability ({flag_str}). What does this survey-based metric mean, and what are its scientific limitations?"
+                                    )
+
+                                ui.button("Explain with Gemini AI", icon="auto_awesome", on_click=explain_in_ai).classes(
+                                    "heartai-btn bg-teal-700 text-white text-xs px-3 py-1.5 rounded-lg mt-2"
+                                )
                             ui.notify("Assessment inference successfully calculated", color="teal")
                         else:
                             ui.notify(f"Inference returned status {resp.status_code}", color="red")
@@ -138,6 +150,83 @@ def index_page():
                 ui.button("Calculate Risk", on_click=submit_assessment).classes(
                     "heartai-btn bg-teal-600 text-white rounded-lg px-4 py-2 font-medium"
                 )
+
+    # --- AI Healthcare Assistant Modal Dialog ---
+    with ui.dialog() as ai_assistant_dialog, ui.card().classes(
+        "p-6 max-w-xl w-full rounded-2xl bg-white shadow-2xl border border-slate-100 flex flex-col gap-4"
+    ):
+        with ui.row().classes("w-full justify-between items-center pb-2 border-b border-slate-100"):
+            with ui.row().classes("items-center gap-2"):
+                ui.icon("auto_awesome", color="teal-600").classes("text-xl")
+                ui.label("HeartAI Clinical AI Assistant").classes("text-lg font-bold text-slate-900")
+            ui.button(icon="close", on_click=ai_assistant_dialog.close).props("flat round dense").classes("text-slate-400")
+
+        ai_chat_scroll = ui.scroll_area().classes("h-72 w-full p-2 bg-slate-50/60 rounded-xl border border-slate-100")
+        with ai_chat_scroll:
+            ai_chat_container = ui.column().classes("gap-3 w-full")
+            with ai_chat_container:
+                with ui.chat_message(name="HeartAI Assistant", stamp="now", avatar="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&q=80"):
+                    ui.label(
+                        "Hello! I am your HeartAI clinical education assistant powered by Google Gemini. "
+                        "I can explain cardiovascular concepts, vital metrics (BP, SpO2, HRV), and model uncertainty. "
+                        "How can I help you today?"
+                    ).classes("text-xs leading-relaxed")
+
+        # Quick Prompt Chips
+        def set_ai_prompt(text: str):
+            ai_input.value = text
+
+        with ui.row().classes("gap-1.5 flex-wrap"):
+            ui.button("Blood Pressure Ranges", on_click=lambda: set_ai_prompt("What are the standard clinical blood pressure ranges?")).props("outline dense").classes("text-[10px] text-teal-700 border-teal-200")
+            ui.button("Why Threshold 0.09?", on_click=lambda: set_ai_prompt("Why does HeartAI use an operating threshold of 0.09?")).props("outline dense").classes("text-[10px] text-teal-700 border-teal-200")
+            ui.button("Life's Essential 8", on_click=lambda: set_ai_prompt("What are the AHA Life's Essential 8 cardiovascular health factors?")).props("outline dense").classes("text-[10px] text-teal-700 border-teal-200")
+
+        with ui.row().classes("w-full gap-2 items-center"):
+            ai_input = ui.input(placeholder="Ask about heart health, metrics, or lifestyle...").classes("flex-1 text-xs").props("outlined dense")
+            ai_send_btn = ui.button(icon="send").classes("bg-teal-600 text-white rounded-lg")
+
+        async def send_ai_message():
+            msg = (ai_input.value or "").strip()
+            if not msg:
+                return
+            ai_input.value = ""
+            with ai_chat_container:
+                with ui.chat_message(name="You", sent=True, stamp="now"):
+                    ui.label(msg).classes("text-xs")
+            ai_chat_scroll.scroll_to(percent=1.0)
+
+            # Call backend AI endpoint
+            try:
+                async with httpx.AsyncClient(timeout=15.0) as client:
+                    resp = await client.post(
+                        f"{BACKEND_API_URL}/api/v1/ai/chat",
+                        json={"message": msg, "user_consent_given": False},
+                    )
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        resp_text = data["response_text"]
+                    else:
+                        resp_text = f"AI service returned HTTP {resp.status_code}."
+            except Exception:
+                from app.ai.assistant import assistant
+                local_resp = assistant.chat(AIChatRequest(message=msg, user_consent_given=False))
+                resp_text = local_resp.response_text
+
+            with ai_chat_container:
+                with ui.chat_message(name="HeartAI Assistant", stamp="now", avatar="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&q=80"):
+                    ui.markdown(resp_text).classes("text-xs leading-relaxed")
+            ai_chat_scroll.scroll_to(percent=1.0)
+
+        ai_send_btn.on("click", send_ai_message)
+        ai_input.on("keydown.enter", send_ai_message)
+
+        def open_ai_with_prompt(prompt_text: str):
+            ai_input.value = prompt_text
+            ai_assistant_dialog.open()
+
+        ui.label(
+            "Educational tool only. Never provides medical diagnoses or prescriptions. In emergencies call 911 / 112."
+        ).classes("text-[9px] text-slate-400 italic text-center w-full")
 
     # 1. NAVIGATION
     with ui.header().classes("heartai-navbar w-full bg-white/80 fixed top-0 left-0 z-50 px-8 py-4 flex justify-between items-center"):
@@ -288,9 +377,15 @@ def index_page():
                         except Exception as err:
                             ui.notify(f"Backend telemetry call notice: {err}", color="orange")
 
-                    ui.button("Generate Detailed Diagnostic Report", icon="description", on_click=generate_diagnostic_report).classes(
-                        "heartai-btn bg-teal-600 text-white text-sm px-4 py-2 rounded-lg"
-                    )
+                    with ui.row().classes("gap-3 items-center flex-wrap"):
+                        ui.button("Generate Detailed Diagnostic Report", icon="description", on_click=generate_diagnostic_report).classes(
+                            "heartai-btn bg-teal-600 text-white text-sm px-4 py-2 rounded-lg"
+                        )
+                        ui.button(
+                            "AI Clinical Insights",
+                            icon="auto_awesome",
+                            on_click=lambda: open_ai_with_prompt("Explain the clinical performance, sensitivity (~80%), and calibration threshold (0.09) of the HeartAI model."),
+                        ).classes("heartai-btn bg-teal-800 text-white text-sm px-4 py-2 rounded-lg")
 
     # 5. HEALTH METRICS SECTION
     with ui.element("section").props('id="metrics"').classes("py-20 px-8 max-w-6xl mx-auto"):
@@ -313,6 +408,11 @@ def index_page():
                 ui.run_javascript(get_update_metric_js("bp", new_bp, 160))
 
             ui.button("Simulate Live Telemetry Update", icon="refresh", on_click=simulate_live_data).classes("heartai-btn bg-slate-900 text-white rounded-lg px-5 py-2.5 shadow")
+            ui.button(
+                "Explain Metrics with AI",
+                icon="help_outline",
+                on_click=lambda: open_ai_with_prompt("Explain the physiological relationship and healthy ranges for Heart Rate (bpm), SpO2 (%), Systolic Blood Pressure, and HRV (ms)."),
+            ).classes("heartai-btn text-teal-700 border border-teal-600 px-5 py-2.5 rounded-lg ml-3")
 
     # 6. BOTTOM DOCTOR BANNER
     with ui.element("section").classes("heartai-banner-section bg-teal-900 text-white py-24 px-8 mt-16 rounded-3xl max-w-6xl mx-auto relative overflow-hidden"):
@@ -331,6 +431,13 @@ def index_page():
 
             with ui.element("div").classes("heartai-banner-reveal-img flex-1 flex justify-center"):
                 ui.image("https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80").classes("rounded-2xl shadow-2xl max-h-72 object-cover border-2 border-teal-500/30")
+
+    # 7. FLOATING AI ASSISTANT ENTRY POINT
+    with ui.page_sticky(position="bottom-right", x_offset=24, y_offset=24):
+        ui.button(
+            icon="smart_toy",
+            on_click=ai_assistant_dialog.open,
+        ).props("round").classes("bg-teal-600 text-white shadow-2xl p-4 hover:bg-teal-700 heartai-pulse")
 
     # CLIENT INITIALIZATION HOOK
     # Runs the motion engine once DOM elements are rendered

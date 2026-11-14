@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from app.api.routes import auth_router, health_router, model_info_router, predict_router
+from app.api.routes import ai_router, auth_router, health_router, model_info_router, predict_router
 from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.db.session import init_db
@@ -110,6 +110,7 @@ app.include_router(health_router)
 app.include_router(model_info_router)
 app.include_router(predict_router)
 app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth")
+app.include_router(ai_router, prefix=f"{settings.API_V1_STR}")
 
 
 # ==============================================================================
