@@ -66,6 +66,10 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = Field(default_factory=_get_default_sqlite_url)
+    REDIS_URL: str | None = Field(
+        None,
+        description="Redis connection URL for distributed rate limiting in multi-worker deployments (e.g. redis://localhost:6379/0).",
+    )
 
     # CORS origins
     CORS_ORIGINS: list[str] = [

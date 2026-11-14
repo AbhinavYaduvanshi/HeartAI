@@ -39,8 +39,17 @@ EMERGENCY_KEYWORDS = [
     r"\bcrushing\s+chest\s+pain\b",
     r"\bchest\s+tightness\b",
     r"\bpressure\s+in\s+(my\s+)?chest\b",
+    r"\bheavy\s+(weight|pressure|heaviness)\s+(on|in)\s+(my\s+)?chest\b",
+    r"\belephant\s+sitting\s+on\s+(my\s+)?chest\b",
+    r"\bsevere\s+squeezing\s+(in|of)\s+(my\s+)?chest\b",
+    r"\b(suffocation|suffocating)\s+(in|around)\s+(my\s+)?chest\b",
+    r"\bchest\s+suffocation\b",
     r"\bpain\s+(radiating|spreading)\s+to\s+(my\s+)?(left\s+)?(arm|jaw|neck|back|shoulder)\b",
+    r"\bburning\s+in\s+(my\s+)?chest\s+(radiating|spreading)\s+to\s+(my\s+)?(left\s+)?(arm|jaw|neck|back|shoulder)\b",
+    r"\bcold\s+sweats?\s+(with|and)\s+chest\s+pain\b",
+    r"\bchest\s+pain\s+(with|and)\s+cold\s+sweats?\b",
     r"\bsevere\s+(shortness\s+of\s+breath|difficulty\s+breathing)\b",
+    r"\bgasping\s+for\s+(air|breath)\b",
     r"\bcan'?t\s+breathe\b",
     r"\bsudden\s+(numbness|weakness|paralysis)\b",
     r"\bslurred\s+speech\b",
@@ -170,9 +179,15 @@ def sanitize_for_logging(data: Any) -> Any:
     if isinstance(data, dict):
         masked: dict[str, Any] = {}
         for k, v in data.items():
-            if k.lower() in {"password", "secret", "token", "api_key", "gemini_api_key"}:
+            k_low = k.lower()
+            if (
+                k_low in {"password", "secret", "secret_key", "token", "api_key", "gemini_api_key"}
+                or "secret" in k_low
+                or "password" in k_low
+                or "token" in k_low
+            ):
                 masked[k] = "[REDACTED_SECRET]"
-            elif k.lower() in {"email", "phone", "name", "address"}:
+            elif k_low in {"email", "phone", "name", "address"}:
                 masked[k] = "[REDACTED_PII]"
             elif isinstance(v, (dict, list)):
                 masked[k] = sanitize_for_logging(v)

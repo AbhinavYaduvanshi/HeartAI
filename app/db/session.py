@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Generator
+from typing import Any
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -15,14 +16,20 @@ from app.core.config import settings
 
 logger = logging.getLogger("heartai.db")
 
-connect_args = {}
+engine_kwargs: dict[str, Any] = {
+    "pool_pre_ping": True,
+}
+
 if settings.DATABASE_URL.startswith("sqlite"):
-    connect_args["check_same_thread"] = False
+    engine_kwargs["connect_args"] = {"check_same_thread": False}
+elif settings.DATABASE_URL.startswith("postgresql"):
+    engine_kwargs["pool_size"] = 10
+    engine_kwargs["max_overflow"] = 20
+    engine_kwargs["pool_recycle"] = 1800
 
 engine = create_engine(
     settings.DATABASE_URL,
-    connect_args=connect_args,
-    pool_pre_ping=True,
+    **engine_kwargs,
 )
 
 SessionLocal = sessionmaker(

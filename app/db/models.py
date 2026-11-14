@@ -14,6 +14,10 @@ from sqlalchemy.sql import func
 from app.db.session import Base
 
 
+def _utc_now() -> datetime.datetime:
+    return datetime.datetime.now(datetime.UTC)
+
+
 class User(Base):
     """User account entity for authenticated physicians and researchers."""
 
@@ -28,8 +32,8 @@ class User(Base):
     consent_terms_version = Column(String(32), nullable=True)
     consent_updated_at = Column(DateTime(timezone=True), nullable=True)
     consent_revoked = Column(Boolean, default=False, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=datetime.datetime.utcnow)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), default=_utc_now)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=_utc_now)
 
     # Relationships
     predictions = relationship("PredictionRecord", back_populates="user", cascade="all, delete-orphan")
@@ -48,7 +52,7 @@ class PredictionRecord(Base):
     operating_threshold = Column(Float, default=0.09, nullable=False)
     model_version = Column(String(32), default="2.1.0", nullable=False)
     user_consent_given = Column(Boolean, nullable=False, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), default=datetime.datetime.utcnow)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), default=_utc_now)
 
     # Relationships
     user = relationship("User", back_populates="predictions")
