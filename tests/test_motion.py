@@ -121,3 +121,44 @@ def test_frontend_animations_backwards_compatibility():
     lottie_js = frontend_animations.get_lottie_heart_loader_js("loader-box", "/path/to/heart.json")
     assert "loader-box" in lottie_js
     assert "/path/to/heart.json" in lottie_js
+
+
+def test_theme_toggle_html_rendering():
+    """Verify theme toggle button HTML generation and accessibility attributes."""
+    toggle_html = motion.render_theme_toggle_html()
+    assert 'class="heartai-theme-toggle"' in toggle_html
+    assert "dark_mode" in toggle_html
+    assert 'aria-label="Toggle light and dark theme"' in toggle_html
+    assert "onclick=" in toggle_html
+
+
+def test_css_design_tokens_and_dual_theme():
+    """Verify CSS file includes complete dual theme tokens and modern glassmorphism classes."""
+    css_content = Path("static/css/heartai-motion.css").read_text(encoding="utf-8")
+    # Teal primary palette
+    assert "--heartai-teal-600: #0d9488;" in css_content
+    assert "--heartai-teal-500: #14b8a6;" in css_content
+    # Purple glassmorphism tokens
+    assert "--heartai-purple-glass-bg:" in css_content
+    assert "--heartai-purple-glow:" in css_content
+    # Dark theme overrides
+    assert '[data-theme="dark"]' in css_content
+    assert "--bg-base: #090d16;" in css_content
+    # Glass & card components
+    assert ".heartai-glass-purple" in css_content
+    assert ".heartai-analytics-card" in css_content
+    assert ".heartai-card-premium" in css_content
+    assert ".heartai-dropdown-menu" in css_content
+
+
+def test_javascript_interactive_managers():
+    """Verify JS file includes theme management, dropdowns, and mobile navigation."""
+    js_content = Path("static/js/heartai-motion.js").read_text(encoding="utf-8")
+    assert "theme:" in js_content
+    assert "heartai_theme" in js_content
+    assert "prefers-color-scheme: dark" in js_content
+    assert "dropdowns:" in js_content
+    assert "mobileNav:" in js_content
+    assert "toggleTheme" in js_content
+
+

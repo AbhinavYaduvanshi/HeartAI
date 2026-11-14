@@ -25,6 +25,7 @@ from motion import (
     render_circular_gauge_svg,
     render_ecg_svg,
     render_risk_gauge_svg,
+    render_theme_toggle_html,
 )
 
 
@@ -98,6 +99,7 @@ __all__ = [
     "get_ecg_scroll_reveal_js",
     "get_lottie_heart_loader_js",
     "get_motion_head_html",
+    "render_theme_toggle_html",
     "get_init_hero_js",
     "get_init_navbar_js",
     "get_init_doctor_images_js",

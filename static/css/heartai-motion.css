@@ -1,22 +1,116 @@
 /**
- * HeartAI Advanced Motion & Animation System
- * Enterprise CSS Transitions & Performance-Engineered Keyframes
+ * HeartAI Unified Design System & Advanced Motion Engine
+ * Phase: Point 10 — UI/UX Modernization, Dual Theme System & Interactive Navigation
+ *
+ * Visual Hierarchy:
+ * 1. Primary: Teal Futuristic Healthcare (Dominant)
+ * 2. Secondary: Purple Glassmorphism (Aarogya Saathi AI & Interactive Modals)
+ * 3. Analytics: Premium High-Contrast Dark Interface (Data & Trajectories)
  */
 
-:root {
-  --heartai-teal: #0d9488;
-  --heartai-teal-light: #14b8a6;
-  --heartai-teal-glow: rgba(13, 148, 136, 0.25);
+/* ==========================================================================
+   1. DESIGN TOKENS & DUAL THEME SYSTEM
+   ========================================================================== */
+
+:root,
+[data-theme="light"] {
+  /* Brand Identity — Teal Futuristic Healthcare */
+  --heartai-teal-50: #f0fdfa;
+  --heartai-teal-100: #ccfbf1;
+  --heartai-teal-200: #99f6e4;
+  --heartai-teal-300: #5eead4;
+  --heartai-teal-400: #2dd4bf;
+  --heartai-teal-500: #14b8a6;
+  --heartai-teal-600: #0d9488; /* Dominant Brand Primary */
+  --heartai-teal-700: #0f766e;
+  --heartai-teal-800: #115e59;
+  --heartai-teal-900: #134e4a;
+  --heartai-teal-950: #042f2e;
+  --heartai-teal-glow: rgba(13, 148, 136, 0.22);
+  --heartai-cyan-glow: rgba(6, 182, 212, 0.25);
+
+  /* Secondary Identity — Purple Glassmorphism (Aarogya Saathi AI) */
+  --heartai-purple-50: #faf5ff;
+  --heartai-purple-100: #f3e8ff;
+  --heartai-purple-400: #c084fc;
+  --heartai-purple-500: #a855f7;
+  --heartai-purple-600: #9333ea;
+  --heartai-purple-700: #7e22ce;
+  --heartai-purple-800: #6b21a8;
+  --heartai-purple-glass-bg: rgba(147, 51, 234, 0.08);
+  --heartai-purple-glass-border: rgba(168, 85, 247, 0.22);
+  --heartai-purple-glow: rgba(168, 85, 247, 0.28);
+
+  /* Clinical Accents */
   --heartai-coral: #ef4444;
   --heartai-coral-glow: rgba(239, 68, 68, 0.25);
-  --heartai-navy: #0f172a;
-  --heartai-card-bg: rgba(255, 255, 255, 0.92);
+  --heartai-amber: #f59e0b;
+  --heartai-emerald: #10b981;
+
+  /* Surface & Background Tokens — Light Theme */
+  --bg-base: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #ffffff;
+  --bg-surface-subtle: #f0fdfa;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-brand: #0d9488;
+  --border-subtle: #e2e8f0;
+  --border-card: rgba(226, 232, 240, 0.85);
+  --border-focus: #0d9488;
+
+  /* Shadows & Glassmorphism */
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-card: 0 10px 25px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+  --shadow-elevated: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --nav-bg: rgba(255, 255, 255, 0.85);
+  --nav-border: rgba(226, 232, 240, 0.7);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.6);
+
+  /* Physics / Easings */
   --heartai-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --heartai-ease-in-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+[data-theme="dark"] {
+  /* Brand Identity in Dark Mode — Enhanced Luminous Teal & Emerald */
+  --heartai-teal-glow: rgba(45, 212, 191, 0.25);
+  --heartai-cyan-glow: rgba(34, 211, 238, 0.3);
+
+  /* Secondary Identity in Dark Mode — Subtle Purple Glass */
+  --heartai-purple-glass-bg: rgba(147, 51, 234, 0.14);
+  --heartai-purple-glass-border: rgba(192, 132, 252, 0.25);
+  --heartai-purple-glow: rgba(192, 132, 252, 0.35);
+
+  /* Surface & Background Tokens — Dark Mode (Deep Charcoal & Near-Black Canvas) */
+  --bg-base: #090d16;
+  --bg-surface: #0f172a;
+  --bg-surface-elevated: #1e293b;
+  --bg-surface-subtle: #0d1e24;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-brand: #2dd4bf;
+  --border-subtle: #1e293b;
+  --border-card: rgba(51, 65, 85, 0.7);
+  --border-focus: #2dd4bf;
+
+  /* Shadows & Glassmorphism in Dark Mode */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 10px 25px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 20px 25px -5px rgba(0, 0, 0, 0.65), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  --nav-bg: rgba(9, 13, 22, 0.88);
+  --nav-border: rgba(30, 41, 59, 0.8);
+  --glass-bg: rgba(15, 23, 42, 0.85);
+  --glass-border: rgba(45, 212, 191, 0.15);
+}
+
 /* ==========================================================================
-   1. ACCESSIBILITY & REDUCED MOTION (Strict Compliance)
+   2. ACCESSIBILITY & REDUCED MOTION (Strict Compliance)
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -31,27 +125,229 @@
   .heartai-pulse,
   .heartai-float,
   .heartai-ecg-path,
-  .heartai-parallax-bg {
+  .heartai-parallax-bg,
+  .aarogya-pulse-ring,
+  .aarogya-typing-dot,
+  .heartai-orb-glow {
     animation: none !important;
     transform: none !important;
   }
 }
 
+/* Accessible focus ring indicators */
+*:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
 /* ==========================================================================
-   2. HERO ANIMATIONS
+   3. THEME DYNAMIC GLOBAL APPLIERS
+   ========================================================================== */
+body,
+.nicegui-content {
+  background-color: var(--bg-base) !important;
+  color: var(--text-primary) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme="dark"] .bg-white {
+  background-color: var(--bg-surface) !important;
+}
+
+[data-theme="dark"] .bg-slate-50,
+[data-theme="dark"] .bg-slate-50\/70,
+[data-theme="dark"] .bg-slate-50\/80 {
+  background-color: var(--bg-surface-subtle) !important;
+}
+
+[data-theme="dark"] .text-slate-900 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .text-slate-700 {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .text-slate-600,
+[data-theme="dark"] .text-slate-500 {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .border-slate-100,
+[data-theme="dark"] .border-slate-200 {
+  border-color: var(--border-card) !important;
+}
+
+[data-theme="dark"] .shadow-sm,
+[data-theme="dark"] .shadow-md,
+[data-theme="dark"] .shadow-lg,
+[data-theme="dark"] .shadow-xl,
+[data-theme="dark"] .shadow-2xl {
+  box-shadow: var(--shadow-card) !important;
+}
+
+/* Dialog / Modal Overrides in Dark Mode */
+[data-theme="dark"] .q-dialog__inner > div {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-card) !important;
+}
+
+/* ==========================================================================
+   4. GLASSMORPHISM & VISUAL DEPTH UTILITIES
+   ========================================================================== */
+.heartai-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid var(--glass-border);
+}
+
+.heartai-glass-purple {
+  background: var(--heartai-purple-glass-bg);
+  backdrop-filter: blur(16px) saturate(190%);
+  -webkit-backdrop-filter: blur(16px) saturate(190%);
+  border: 1px solid var(--heartai-purple-glass-border);
+  box-shadow: 0 8px 32px 0 var(--heartai-purple-glow);
+}
+
+.heartai-card-premium {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-card);
+  border-radius: 1.25rem;
+  transition: transform 0.28s var(--heartai-ease-out-expo),
+              box-shadow 0.28s var(--heartai-ease-out-expo),
+              border-color 0.28s ease;
+}
+
+.heartai-card-premium:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--heartai-teal-400);
+}
+
+/* ==========================================================================
+   5. NAVIGATION BAR & THEME SWITCHER
+   ========================================================================== */
+.heartai-navbar {
+  background-color: var(--nav-bg) !important;
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border-bottom: 1px solid var(--nav-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, padding 0.3s var(--heartai-ease-out-expo);
+  will-change: background-color, border-color, box-shadow;
+}
+
+.heartai-navbar.heartai-nav-scrolled {
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  padding-top: 0.65rem !important;
+  padding-bottom: 0.65rem !important;
+}
+
+[data-theme="dark"] .heartai-navbar.heartai-nav-scrolled {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* Active Link Sliding Underline Indicator */
+.heartai-nav-link {
+  position: relative;
+  transition: color 0.24s ease;
+  color: var(--text-secondary);
+}
+
+.heartai-nav-link:hover {
+  color: var(--text-brand);
+}
+
+.heartai-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2.5px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--heartai-teal-600), var(--heartai-teal-400));
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.3s var(--heartai-ease-out-expo);
+}
+
+.heartai-nav-link:hover::after,
+.heartai-nav-link.active::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.heartai-nav-link.active {
+  color: var(--text-brand) !important;
+}
+
+/* Interactive Theme Switcher Button */
+.heartai-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 0.25s ease, transform 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.heartai-theme-toggle:hover {
+  background: var(--heartai-teal-50);
+  color: var(--heartai-teal-700);
+  border-color: var(--heartai-teal-300);
+  transform: rotate(15deg) scale(1.05);
+}
+
+[data-theme="dark"] .heartai-theme-toggle:hover {
+  background: var(--bg-surface-subtle);
+  color: var(--heartai-teal-300);
+  border-color: var(--heartai-teal-500);
+}
+
+/* Dropdown Menu Overlay */
+.heartai-dropdown-menu {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-elevated);
+  border-radius: 1rem;
+  min-width: 14rem;
+  z-index: 60;
+  transition: opacity 0.2s ease, transform 0.2s var(--heartai-ease-out-expo);
+}
+
+/* ==========================================================================
+   6. HERO & CARDIOVASCULAR VISUAL EXPERIENCE
    ========================================================================== */
 .heartai-hero-headline {
   will-change: transform, opacity;
+  color: var(--text-primary);
 }
 
 .heartai-teal-accent {
   display: inline-block;
   position: relative;
-  color: var(--heartai-teal);
-  background: linear-gradient(120deg, var(--heartai-teal), var(--heartai-teal-light));
+  background: linear-gradient(120deg, var(--heartai-teal-600), var(--heartai-teal-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   will-change: transform, opacity;
+}
+
+[data-theme="dark"] .heartai-teal-accent {
+  background: linear-gradient(120deg, #2dd4bf, #5eead4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .heartai-heart-visual {
@@ -86,7 +382,7 @@
   will-change: stroke-dashoffset;
 }
 
-/* Interactive Button Hover Physics */
+/* Interactive Button Hover Dynamics */
 .heartai-btn {
   position: relative;
   overflow: hidden;
@@ -106,89 +402,140 @@
   box-shadow: 0 2px 8px var(--heartai-teal-glow);
 }
 
-.heartai-btn::after {
-  content: '';
+/* ==========================================================================
+   7. AAROGYA SAATHI AI ASSISTANT — PURPLE GLASSMORPHISM (Ref 2 Inspiration)
+   ========================================================================== */
+.aarogya-avatar-btn {
+  background: linear-gradient(135deg, #0d9488 0%, #7c3aed 50%, #6366f1 100%);
+  box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4), 0 8px 10px -6px rgba(13, 148, 136, 0.3);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.aarogya-avatar-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 16px 32px -5px rgba(124, 58, 237, 0.5), 0 10px 14px -6px rgba(13, 148, 136, 0.4);
+}
+
+.aarogya-pulse-ring {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 150%;
-  height: 150%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 60%);
-  transform: translate(-50%, -50%) scale(0);
-  opacity: 0;
+  inset: -6px;
+  border-radius: 9999px;
+  border: 2px solid rgba(168, 85, 247, 0.5);
+  animation: aarogya-ring-pulse 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   pointer-events: none;
-  transition: transform 0.5s ease-out, opacity 0.3s ease-out;
 }
 
-.heartai-btn:hover::after {
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
+@keyframes aarogya-ring-pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.15; }
+  100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* ==========================================================================
-   3. NAVIGATION ANIMATIONS
-   ========================================================================== */
-.heartai-navbar {
-  transition: background-color 0.35s ease,
-              backdrop-filter 0.35s ease,
-              box-shadow 0.35s ease,
-              padding 0.35s var(--heartai-ease-out-expo);
-  will-change: background-color, backdrop-filter, box-shadow;
+.aarogya-typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--heartai-purple-500);
+  display: inline-block;
+  animation: aarogya-bounce 1.4s infinite ease-in-out both;
 }
 
-.heartai-navbar.heartai-nav-scrolled {
-  background-color: rgba(255, 255, 255, 0.88) !important;
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
-  padding-top: 0.65rem !important;
-  padding-bottom: 0.65rem !important;
+.aarogya-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.aarogya-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes aarogya-bounce {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+  40% { transform: scale(1); opacity: 1; }
 }
 
-/* Active Link Sliding Underline Indicator */
-.heartai-nav-link {
-  position: relative;
-  transition: color 0.24s ease;
+.aarogya-emergency-banner {
+  background: linear-gradient(135deg, rgba(254, 242, 242, 0.95) 0%, rgba(254, 226, 226, 0.95) 100%);
+  border-left: 4px solid #ef4444;
 }
 
-.heartai-nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 100%;
-  height: 2.5px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, var(--heartai-teal), var(--heartai-teal-light));
-  transform: scaleX(0);
-  transform-origin: right center;
-  transition: transform 0.3s var(--heartai-ease-out-expo);
-}
-
-.heartai-nav-link:hover::after,
-.heartai-nav-link.active::after {
-  transform: scaleX(1);
-  transform-origin: left center;
+[data-theme="dark"] .aarogya-emergency-banner {
+  background: linear-gradient(135deg, rgba(69, 10, 10, 0.85) 0%, rgba(127, 29, 29, 0.85) 100%);
+  border-left: 4px solid #ef4444;
 }
 
 /* ==========================================================================
-   4. DOCTOR IMAGES & CARDS
+   8. ANALYTICS & METRIC CARDS (Ref 1 & Ref 3 Inspiration)
    ========================================================================== */
+.heartai-analytics-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.28s var(--heartai-ease-out-expo),
+              box-shadow 0.28s var(--heartai-ease-out-expo),
+              border-color 0.28s ease;
+}
+
+.heartai-analytics-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--heartai-teal-400);
+}
+
+[data-theme="dark"] .heartai-analytics-card {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.heartai-ring-svg {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.heartai-ring-bg {
+  stroke: var(--border-subtle);
+}
+
+.heartai-ring-circle {
+  transition: stroke-dashoffset 1.4s var(--heartai-ease-out-expo);
+  stroke-linecap: round;
+  will-change: stroke-dashoffset;
+}
+
+.heartai-gauge-svg {
+  overflow: visible;
+}
+
+.heartai-gauge-needle {
+  transform-origin: 50% 100%;
+  transition: transform 1.2s var(--heartai-ease-out-expo);
+  will-change: transform;
+}
+
+.heartai-counter {
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+}
+
+/* Doctor Cards with 3D Image Physics */
 .heartai-doctor-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
   transition: transform 0.35s var(--heartai-ease-out-expo),
               box-shadow 0.35s var(--heartai-ease-out-expo),
               border-color 0.35s ease;
-  will-change: transform, box-shadow;
 }
 
 .heartai-doctor-card:hover {
   transform: translateY(-6px) scale(1.015);
-  box-shadow: 0 16px 36px rgba(13, 148, 136, 0.12), 0 4px 12px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 16px 36px var(--heartai-teal-glow), var(--shadow-elevated);
+  border-color: var(--heartai-teal-400);
 }
 
 .heartai-doctor-img-wrap {
   overflow: hidden;
   border-radius: inherit;
+  background-color: var(--bg-surface-subtle);
 }
 
 .heartai-doctor-img {
@@ -200,56 +547,7 @@
   transform: scale(1.06);
 }
 
-/* ==========================================================================
-   5. ANALYTICS & HEALTH METRICS
-   ========================================================================== */
-.heartai-metric-card {
-  will-change: transform, opacity;
-  transition: transform 0.28s var(--heartai-ease-out-expo),
-              box-shadow 0.28s var(--heartai-ease-out-expo);
-}
-
-.heartai-metric-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.07);
-}
-
-/* Circular Progress Rings */
-.heartai-ring-svg {
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-}
-
-.heartai-ring-bg {
-  stroke: rgba(226, 232, 240, 0.8);
-}
-
-.heartai-ring-circle {
-  transition: stroke-dashoffset 1.4s var(--heartai-ease-out-expo);
-  stroke-linecap: round;
-  will-change: stroke-dashoffset;
-}
-
-/* Risk Gauge Arc */
-.heartai-gauge-svg {
-  overflow: visible;
-}
-
-.heartai-gauge-needle {
-  transform-origin: 50% 100%;
-  transition: transform 1.2s var(--heartai-ease-out-expo);
-  will-change: transform;
-}
-
-/* Numerical Statistics Counter */
-.heartai-counter {
-  font-variant-numeric: tabular-nums;
-  display: inline-block;
-}
-
-/* ==========================================================================
-   6. BOTTOM DOCTOR BANNER & PARALLAX
-   ========================================================================== */
+/* Parallax Banner */
 .heartai-banner-section {
   position: relative;
   overflow: hidden;
@@ -264,83 +562,3 @@
   will-change: transform;
   pointer-events: none;
 }
-
-.heartai-banner-reveal-img {
-  will-change: transform, opacity;
-}
-
-.heartai-banner-text {
-  will-change: transform, opacity;
-}
-
-/* Subtle Floating Elements */
-.heartai-float {
-  animation: heartai-float-motion 4s ease-in-out infinite alternate;
-}
-
-@keyframes heartai-float-motion {
-  0% { transform: translateY(0px); }
-  100% { transform: translateY(-8px); }
-}
-
-/* ==========================================================================
-   7. AAROGYA SAATHI (आरोग्य साथी) AI ASSISTANT STYLING
-   ========================================================================== */
-.aarogya-avatar-btn {
-  background: linear-gradient(135deg, #0d9488 0%, #0f766e 60%, #b45309 100%);
-  box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.4), 0 8px 10px -6px rgba(180, 83, 9, 0.3);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.aarogya-avatar-btn:hover {
-  transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 16px 30px -5px rgba(13, 148, 136, 0.5), 0 10px 14px -6px rgba(180, 83, 9, 0.4);
-}
-
-.aarogya-pulse-ring {
-  position: absolute;
-  inset: -4px;
-  border-radius: 9999px;
-  border: 2px solid rgba(20, 184, 166, 0.6);
-  animation: aarogya-ring-pulse 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  pointer-events: none;
-}
-
-@keyframes aarogya-ring-pulse {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.12); opacity: 0.15; }
-  100% { transform: scale(0.95); opacity: 0.8; }
-}
-
-.aarogya-typing-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background-color: #0d9488;
-  display: inline-block;
-  animation: aarogya-bounce 1.4s infinite ease-in-out both;
-}
-
-.aarogya-typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.aarogya-typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-@keyframes aarogya-bounce {
-  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
-  40% { transform: scale(1); opacity: 1; }
-}
-
-.aarogya-emergency-banner {
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-  border-left: 4px solid #ef4444;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .aarogya-pulse-ring,
-  .aarogya-typing-dot,
-  .aarogya-avatar-btn {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-
-

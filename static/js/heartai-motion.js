@@ -27,9 +27,134 @@
     },
 
     /**
+     * Theme Management Engine (Point 10 Dual-Theme)
+     */
+    theme: {
+      get() {
+        try {
+          const saved = localStorage.getItem('heartai_theme');
+          if (saved) return saved;
+        } catch (e) {}
+        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      },
+      set(newTheme) {
+        document.documentElement.setAttribute('data-theme', newTheme);
+        try { localStorage.setItem('heartai_theme', newTheme); } catch (e) {}
+        this.updateButtons(newTheme);
+        window.dispatchEvent(new CustomEvent('heartai:themechange', { detail: { theme: newTheme } }));
+      },
+      toggle() {
+        const next = this.get() === 'dark' ? 'light' : 'dark';
+        this.set(next);
+        return next;
+      },
+      updateButtons(currentTheme) {
+        const btns = document.querySelectorAll('.heartai-theme-toggle');
+        btns.forEach(btn => {
+          btn.setAttribute('aria-label', currentTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+          btn.setAttribute('title', currentTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+          if (currentTheme === 'dark') {
+            btn.innerHTML = '<span class="material-icons text-amber-300 text-lg">light_mode</span>';
+          } else {
+            btn.innerHTML = '<span class="material-icons text-slate-700 text-lg">dark_mode</span>';
+          }
+        });
+      },
+      init() {
+        const current = this.get();
+        document.documentElement.setAttribute('data-theme', current);
+        this.updateButtons(current);
+
+        if (window.matchMedia) {
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            try {
+              if (!localStorage.getItem('heartai_theme')) {
+                this.set(e.matches ? 'dark' : 'light');
+              }
+            } catch (err) {}
+          });
+        }
+      }
+    },
+
+    /**
+     * Dropdown Menu Interactions
+     */
+    dropdowns: {
+      init() {
+        document.addEventListener('click', (e) => {
+          const toggle = e.target.closest('[data-dropdown-toggle]');
+          if (toggle) {
+            e.preventDefault();
+            e.stopPropagation();
+            const targetId = toggle.getAttribute('data-dropdown-toggle');
+            const menu = document.getElementById(targetId);
+            if (menu) {
+              const wasHidden = menu.classList.contains('hidden');
+              document.querySelectorAll('.heartai-dropdown-menu').forEach(m => m.classList.add('hidden'));
+              if (wasHidden) {
+                menu.classList.remove('hidden');
+              }
+            }
+            return;
+          }
+
+          if (!e.target.closest('.heartai-dropdown-menu')) {
+            document.querySelectorAll('.heartai-dropdown-menu').forEach(m => m.classList.add('hidden'));
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            document.querySelectorAll('.heartai-dropdown-menu').forEach(m => m.classList.add('hidden'));
+          }
+        });
+      }
+    },
+
+    /**
+     * Mobile Navigation Drawer Interactions
+     */
+    mobileNav: {
+      toggle() {
+        const menu = document.getElementById('heartai-mobile-menu');
+        const backdrop = document.getElementById('heartai-mobile-backdrop');
+        if (!menu) return;
+        const isHidden = menu.classList.contains('hidden');
+        if (isHidden) {
+          menu.classList.remove('hidden');
+          if (backdrop) backdrop.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        } else {
+          menu.classList.add('hidden');
+          if (backdrop) backdrop.classList.add('hidden');
+          document.body.style.overflow = '';
+        }
+      },
+      close() {
+        const menu = document.getElementById('heartai-mobile-menu');
+        const backdrop = document.getElementById('heartai-mobile-backdrop');
+        if (menu) menu.classList.add('hidden');
+        if (backdrop) backdrop.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    },
+
+    // Shorthand delegators
+    toggleTheme() { return this.theme.toggle(); },
+    getTheme() { return this.theme.get(); },
+    setTheme(t) { return this.theme.set(t); },
+    toggleMobileNav() { return this.mobileNav.toggle(); },
+    closeMobileNav() { return this.mobileNav.close(); },
+
+    /**
      * Initializes GSAP & ScrollTrigger plugins safely
      */
     init() {
+      // Initialize theme and interactive listeners immediately
+      this.theme.init();
+      this.dropdowns.init();
+
       if (this.initialized) return true;
 
       if (typeof window.gsap === 'undefined') {
@@ -42,7 +167,7 @@
       }
 
       this.initialized = true;
-      console.log('[HeartAI Motion] Motion engine initialized successfully.');
+      console.log('[HeartAI Motion] Motion engine and dual-theme controller initialized.');
       return true;
     },
 

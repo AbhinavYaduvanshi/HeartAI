@@ -156,11 +156,13 @@ def render_anatomical_heart_svg(
     size: int = 120,
     pulse: bool = True,
     css_class: str = "heartai-heart-visual",
+    holographic: bool = False,
 ) -> str:
-    """Generates a modern anatomical heart icon with gradient lighting and cardiac pulse class."""
+    """Generates a modern anatomical heart icon with gradient lighting, optional holographic glow, and cardiac pulse."""
     pulse_class = "heartai-pulse" if pulse else ""
+    glow_filter = 'filter: drop-shadow(0 0 18px rgba(45, 212, 191, 0.45));' if holographic else ''
     return f"""
-    <div class="{css_class} {pulse_class}" style="display:inline-block; width:{size}px; height:{size}px;">
+    <div class="{css_class} {pulse_class}" style="display:inline-block; width:{size}px; height:{size}px; {glow_filter}">
         <svg viewBox="0 0 100 100" width="{size}" height="{size}" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -168,15 +170,24 @@ def render_anatomical_heart_svg(
                     <stop offset="50%" stop-color="#dc2626" />
                     <stop offset="100%" stop-color="#991b1b" />
                 </linearGradient>
+                <linearGradient id="hologramGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#2dd4bf" />
+                    <stop offset="50%" stop-color="#0d9488" />
+                    <stop offset="100%" stop-color="#042f2e" />
+                </linearGradient>
                 <filter id="heartShadow" x="-20%" y="-20%" width="140%" height="140%">
                     <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="rgba(239, 68, 68, 0.35)" />
                 </filter>
             </defs>
             <path d="M 50 88 C 22 70 8 50 8 32 C 8 16 22 6 36 6 C 43 6 48 10 50 14 C 52 10 57 6 64 6 C 78 6 92 16 92 32 C 92 50 78 70 50 88 Z"
-                  fill="url(#heartGrad)" filter="url(#heartShadow)" />
+                  fill="url(#{'hologramGrad' if holographic else 'heartGrad'})" filter="url(#heartShadow)" />
             <!-- Interior vascular anatomical accents -->
             <path d="M 46 22 Q 42 34 35 48" stroke="rgba(255,255,255,0.45)" stroke-width="3" stroke-linecap="round" />
             <path d="M 54 20 Q 58 36 65 46" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round" />
+            <!-- Cyan/Emerald glowing data nodes (Ref 1 & Ref 3) -->
+            <circle cx="35" cy="48" r="2.5" fill="#2dd4bf" />
+            <circle cx="65" cy="46" r="2.5" fill="#38bdf8" />
+            <circle cx="50" cy="35" r="3" fill="#a855f7" />
         </svg>
     </div>
     """.strip()
@@ -196,17 +207,17 @@ def render_circular_gauge_svg(
     size = int((radius + stroke_width) * 2 + 10)
     center = size / 2
     return f"""
-    <div class="heartai-metric-card" style="text-align:center; display:inline-block; margin:8px;">
+    <div class="heartai-metric-card heartai-card-premium" style="text-align:center; display:inline-block; margin:8px; padding:16px;">
         <svg class="heartai-ring-svg" width="{size}" height="{size}">
             <circle class="heartai-ring-bg" stroke-width="{stroke_width}" fill="transparent" r="{radius}" cx="{center}" cy="{center}"/>
             <circle id="{metric_id}-ring" class="heartai-ring-circle" stroke="{color}" stroke-width="{stroke_width}"
                     fill="transparent" r="{radius}" cx="{center}" cy="{center}" data-percent="{percent}"/>
         </svg>
         <div style="margin-top:-{size * 0.65}px; height:{size * 0.65}px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-            <div style="font-weight:700; font-size:1.25rem; color:#0f172a;">
-                <span id="{metric_id}-val">{display_value}</span><span style="font-size:0.85rem; font-weight:500; color:#64748b;">{unit}</span>
+            <div style="font-weight:700; font-size:1.25rem; color:var(--text-primary);">
+                <span id="{metric_id}-val">{display_value}</span><span style="font-size:0.85rem; font-weight:500; color:var(--text-muted);">{unit}</span>
             </div>
-            <div style="font-size:0.75rem; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">{label}</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">{label}</div>
         </div>
     </div>
     """.strip()
@@ -236,13 +247,23 @@ def render_risk_gauge_svg(
             <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#riskArcGrad)" stroke-width="16" stroke-linecap="round"/>
             <!-- Gauge Needle -->
             <g class="heartai-gauge-needle" data-angle="{angle:.1f}" style="transform-origin: 100px 100px;">
-                <polygon points="98,100 102,100 100,28" fill="#0f172a"/>
-                <circle cx="100" cy="100" r="7" fill="#0f172a"/>
-                <circle cx="100" cy="100" r="3" fill="#ffffff"/>
+                <polygon points="98,100 102,100 100,28" fill="var(--text-primary, #0f172a)"/>
+                <circle cx="100" cy="100" r="7" fill="var(--text-primary, #0f172a)"/>
+                <circle cx="100" cy="100" r="3" fill="var(--bg-surface, #ffffff)"/>
             </g>
         </svg>
-        <div style="margin-top:6px; font-weight:700; font-size:1.1rem; color:#0f172a;">
-            {risk_score_percent}% <span style="font-size:0.9rem; font-weight:600; color:#0d9488;">— {risk_category}</span>
+        <div style="margin-top:6px; font-weight:700; font-size:1.1rem; color:var(--text-primary, #0f172a);">
+            {risk_score_percent}% <span style="font-size:0.9rem; font-weight:600; color:var(--text-brand, #0d9488);">— {risk_category}</span>
         </div>
     </div>
+    """.strip()
+
+
+def render_theme_toggle_html(css_class: str = "heartai-theme-toggle") -> str:
+    """Generates an accessible theme toggle button."""
+    return f"""
+    <button class="{css_class}" onclick="window.HeartAIMotion && window.HeartAIMotion.toggleTheme()"
+            aria-label="Toggle light and dark theme" title="Toggle theme" type="button">
+        <span class="material-icons text-slate-700 text-lg">dark_mode</span>
+    </button>
     """.strip()
