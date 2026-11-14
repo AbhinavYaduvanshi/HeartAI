@@ -43,6 +43,8 @@ class ModelService:
         self.metadata: dict[str, Any] = {}
         self.is_loaded: bool = False
         self.sha256_verified: bool = False
+        self.model_sha256_verified: bool = False
+        self.preprocessor_sha256_verified: bool = False
         self.actual_sha256: str = ""
         self.actual_preprocessor_sha256: str = ""
         self.operating_threshold: float = settings.OPERATING_THRESHOLD
@@ -81,6 +83,8 @@ class ModelService:
             # Reset verification flags to fail-closed state
             self.is_loaded = False
             self.sha256_verified = False
+            self.model_sha256_verified = False
+            self.preprocessor_sha256_verified = False
 
             meta_path = Path(settings.METADATA_PATH)
             model_path = Path(settings.MODEL_PATH)
@@ -119,6 +123,7 @@ class ModelService:
                 raise ModelIntegrityError(
                     f"Model SHA-256 mismatch! Expected {expected_model_sha}, got {self.actual_sha256}"
                 )
+            self.model_sha256_verified = True
 
             # 3. Strict Preprocessing Pipeline SHA-256 Checksum Verification
             prep_meta = self.metadata.get("preprocessing", {})
@@ -137,6 +142,7 @@ class ModelService:
                 raise ModelIntegrityError(
                     f"Preprocessing pipeline SHA-256 mismatch! Expected {expected_prep_sha}, got {self.actual_preprocessor_sha256}"
                 )
+            self.preprocessor_sha256_verified = True
 
             # 4. Strict Feature Manifest & Ordering Verification
             try:
@@ -230,7 +236,9 @@ class ModelService:
             "loaded": self.is_loaded,
             "model_id": self.metadata.get("model_id", "unknown"),
             "version": self.metadata.get("version", "unknown"),
-            "sha256_verified": self.sha256_verified,
+            "sha256_verified": self.model_sha256_verified,
+            "model_sha256_verified": self.model_sha256_verified,
+            "preprocessor_sha256_verified": self.preprocessor_sha256_verified,
             "model_sha256": self.actual_sha256,
             "preprocessor_sha256": self.actual_preprocessor_sha256,
             "operating_threshold": self.operating_threshold,

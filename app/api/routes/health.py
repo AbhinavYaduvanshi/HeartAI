@@ -29,7 +29,16 @@ def get_system_health() -> HealthResponse:
     db_ok, db_dialect = check_db_connection()
     model_status_dict = model_service.get_status()
 
-    is_healthy = db_ok and model_status_dict.get("loaded", False)
+    is_loaded = bool(model_status_dict.get("loaded", False))
+    # Independently resolve model SHA verification (defaulting strictly to False)
+    model_verified = bool(
+        model_status_dict.get("model_sha256_verified", model_status_dict.get("sha256_verified", False))
+    )
+    # Independently resolve preprocessor SHA verification (defaulting strictly to False)
+    prep_verified = bool(model_status_dict.get("preprocessor_sha256_verified", False))
+
+    # Overall health must not report fully healthy if either required artifact has failed verification
+    is_healthy = db_ok and is_loaded and model_verified and prep_verified
     status_str = "healthy" if is_healthy else "degraded"
 
     return HealthResponse(
@@ -39,12 +48,13 @@ def get_system_health() -> HealthResponse:
         uptime_seconds=round(uptime, 2),
         timestamp=datetime.now(UTC).isoformat(),
         model=ModelHealthStatus(
-            loaded=model_status_dict.get("loaded", False),
+            loaded=is_loaded,
             model_id=str(model_status_dict.get("model_id", "unknown")),
             version=str(model_status_dict.get("version", "unknown")),
-            sha256_verified=bool(model_status_dict.get("sha256_verified", False)),
+            sha256_verified=model_verified,
+            model_sha256_verified=model_verified,
             operating_threshold=float(model_status_dict.get("operating_threshold", 0.09)),
-            preprocessor_sha256_verified=bool(model_status_dict.get("sha256_verified", False)),
+            preprocessor_sha256_verified=prep_verified,
             feature_count=int(model_status_dict.get("feature_count", 25)),
         ),
         database=DatabaseHealthStatus(

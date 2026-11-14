@@ -5,7 +5,7 @@ Validates:
 - Fail-closed model artifact integrity (model SHA-256, preprocessor SHA-256, feature schema manifest)
 - Privacy enforcement: keyed HMAC-SHA256 pseudonymization (never plain unsalted hash)
 - Explicit informed consent flow (omitted/false never persists; terms version required)
-- Prediction history deletion endpoints (GDPR Art. 17 / HIPAA Right to Erasure)
+- Prediction history deletion endpoints supporting user data erasure workflows
 - Constant-time authentication failure responses (anti-enumeration)
 - Production CORS restrictions (rejects wildcard '*')
 - Dual-key zero-downtime secret rotation
@@ -321,7 +321,7 @@ def test_consent_true_with_valid_terms_persists_keyed_record(client, db_session)
 
 
 # ==============================================================================
-# 5. Prediction History Deletion (GDPR Art. 17 / HIPAA Erasure)
+# 5. Prediction History Deletion (User Data Erasure Workflow)
 # ==============================================================================
 
 

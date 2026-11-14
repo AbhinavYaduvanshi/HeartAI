@@ -63,14 +63,15 @@ In accordance with Point 7.1 requirements, a focused, defense-in-depth security 
    - Because the pepper key is held strictly in environment memory and never persisted in the database, external adversaries cannot perform offline dictionary attacks.
 3. **Raw Data Prohibition**:
    - Raw physiological and demographic survey responses are **strictly ephemeral** and never written to persistent disk storage or database tables.
-4. **Data Retention & Right to Erasure (GDPR Art. 17 / HIPAA)**:
+4. **Data Retention & User Deletion Workflows**:
    - Added `DELETE /api/v1/auth/history` to purge all historical prediction audit records for an authenticated user.
    - Added `DELETE /api/v1/auth/history/{record_id}` to delete a specific record.
+   - Provides user telemetry erasure workflows supporting privacy and data subject rights (without claiming deletion endpoints alone establish full statutory GDPR or HIPAA compliance).
    - Anonymous predictions are unlinked to any account.
 
 ### D. Explicit Informed Consent Architecture
 1. **Privacy by Default**:
-   - Consent checkbox in [motion_demo.py](file:///c:/Users/24abh/OneDrive/Documents/heart%20health%20moniter%20system/motion_demo.py) is unselected by default (`value=False`), complying with GDPR Article 7 requirements for clear affirmative action.
+   - Consent checkbox in [motion_demo.py](file:///c:/Users/24abh/OneDrive/Documents/heart%20health%20moniter%20system/motion_demo.py) is unselected by default (`value=False`), adhering to Privacy by Default principles for explicit affirmative consent.
 2. **Consent Terms Versioning**:
    - Added `consent_terms_version: str | None` to `PredictionRequest` and `PredictionResponse`.
    - Backend requires `user_consent_given == True` **AND** `consent_terms_version == "2026.1"`.

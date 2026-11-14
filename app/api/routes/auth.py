@@ -138,7 +138,7 @@ def purge_user_prediction_history(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Enforces Right to Erasure (GDPR Art. 17 / HIPAA) by deleting all user predictions."""
+    """Provides user prediction history deletion functionality supporting privacy and data subject erasure workflows."""
     deleted_count = (
         db.query(PredictionRecord)
         .filter(PredictionRecord.user_id == current_user.id)

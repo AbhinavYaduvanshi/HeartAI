@@ -151,6 +151,8 @@ def test_health_endpoint(client):
     assert model_stat["loaded"] is True
     assert model_stat["version"] == "2.1.0"
     assert model_stat["sha256_verified"] is True
+    assert model_stat["model_sha256_verified"] is True
+    assert model_stat["preprocessor_sha256_verified"] is True
     assert model_stat["operating_threshold"] == 0.09
 
     # Database status
