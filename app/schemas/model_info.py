@@ -37,3 +37,4 @@ class ModelInfoResponse(BaseModel):
     features: list[str] = Field(..., description="Ordered list of required 25 input features")
     features_detailed: list[FeatureInfo] = Field(default_factory=list, description="Detailed feature codebook specs")
     educational_disclaimer: str = Field(..., description="Standard scientific non-diagnostic disclaimer")
+

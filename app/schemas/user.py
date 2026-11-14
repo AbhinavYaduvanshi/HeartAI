@@ -53,3 +53,4 @@ class PredictionHistoryItem(BaseModel):
 
     class Config:
         from_attributes = True
+

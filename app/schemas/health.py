@@ -13,6 +13,8 @@ class ModelHealthStatus(BaseModel):
     version: str = Field(..., description="Active model version")
     sha256_verified: bool = Field(..., description="Integrity check result against metadata hash")
     operating_threshold: float = Field(0.09, description="Calibrated operating threshold")
+    preprocessor_sha256_verified: bool = Field(True, description="Preprocessing pipeline integrity status")
+    feature_count: int = Field(25, description="Validated input feature count")
 
 
 class DatabaseHealthStatus(BaseModel):

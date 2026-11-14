@@ -40,3 +40,4 @@ def predict_cardiovascular_risk(
         db=db,
         current_user=current_user,
     )
+

@@ -95,6 +95,7 @@ VALID_BASELINE_PAYLOAD = {
     "MedCostObstacle": 0,
     "PersonalDoctor": 1,
     "user_consent_given": False,
+    "consent_terms_version": None,
 }
 
 VALID_SYMPTOMATIC_PAYLOAD = {
@@ -124,6 +125,7 @@ VALID_SYMPTOMATIC_PAYLOAD = {
     "MedCostObstacle": 0,
     "PersonalDoctor": 1,
     "user_consent_given": True,
+    "consent_terms_version": "2026.1",
 }
 
 

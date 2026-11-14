@@ -1,7 +1,7 @@
 """HeartAI Model Loading and Execution Service.
 
-Provides thread-safe singleton model management, SHA-256 checksum verification,
-pipeline transformations, and calibrated probability predictions.
+Provides thread-safe singleton model management, multi-artifact SHA-256 checksum
+verification, feature schema enforcement, pipeline transformations, and calibrated inference.
 """
 
 from __future__ import annotations
@@ -20,9 +20,11 @@ from app.core.config import settings
 
 logger = logging.getLogger("heartai.services.model")
 
+EXPECTED_FEATURE_COUNT = 25
+
 
 class ModelIntegrityError(Exception):
-    """Raised when an artifact's cryptographic hash does not match metadata."""
+    """Raised when an artifact's cryptographic hash, metadata, or schema fails verification."""
 
 
 class ModelLoadError(Exception):
@@ -42,6 +44,7 @@ class ModelService:
         self.is_loaded: bool = False
         self.sha256_verified: bool = False
         self.actual_sha256: str = ""
+        self.actual_preprocessor_sha256: str = ""
         self.operating_threshold: float = settings.OPERATING_THRESHOLD
 
     @classmethod
@@ -63,14 +66,26 @@ class ModelService:
         return sha.hexdigest()
 
     def load_artifacts(self, force_reload: bool = False) -> None:
-        """Loads and verifies production model and preprocessing pipeline."""
+        """Loads and verifies production model and preprocessing pipeline fail-closed.
+
+        Strictly enforces:
+        1. Non-empty, valid SHA-256 for best_model.joblib
+        2. Non-empty, valid SHA-256 for preprocessing_pipeline.joblib
+        3. Model version and preprocessor version consistency
+        4. Canonical 25-feature count and ordering against manifest
+        """
         if self.is_loaded and not force_reload:
             return
 
         with self._lock:
+            # Reset verification flags to fail-closed state
+            self.is_loaded = False
+            self.sha256_verified = False
+
             meta_path = Path(settings.METADATA_PATH)
             model_path = Path(settings.MODEL_PATH)
             prep_path = Path(settings.PREPROCESSOR_PATH)
+            feat_manifest_path = Path("models/feature_names.json")
 
             if not meta_path.exists():
                 raise ModelLoadError(f"Model metadata not found at {meta_path}")
@@ -78,45 +93,93 @@ class ModelService:
                 raise ModelLoadError(f"Model artifact not found at {model_path}")
             if not prep_path.exists():
                 raise ModelLoadError(f"Preprocessing pipeline not found at {prep_path}")
+            if not feat_manifest_path.exists():
+                raise ModelLoadError(f"Feature manifest not found at {feat_manifest_path}")
 
-            # 1. Read metadata
-            with open(meta_path, encoding="utf-8") as f:
-                self.metadata = json.load(f)
+            # 1. Read and validate metadata manifest
+            try:
+                with open(meta_path, encoding="utf-8") as f:
+                    self.metadata = json.load(f)
+            except Exception as err:
+                raise ModelIntegrityError(f"Metadata file is malformed JSON: {err}") from err
 
-            expected_sha256 = self.metadata.get("sha256_checksum", "").strip().lower()
+            # Check required manifest keys
+            required_keys = {"model_id", "version", "sha256_checksum", "calibration"}
+            missing_keys = required_keys - set(self.metadata.keys())
+            if missing_keys:
+                raise ModelIntegrityError(f"Metadata manifest is missing required keys: {missing_keys}")
 
-            # 2. Verify SHA-256 integrity
+            # 2. Strict Model SHA-256 Checksum Verification
+            expected_model_sha = self.metadata.get("sha256_checksum", "").strip().lower()
+            if not expected_model_sha or len(expected_model_sha) != 64:
+                raise ModelIntegrityError("Model expected SHA-256 checksum is missing, empty, or invalid.")
+
             self.actual_sha256 = self.compute_sha256(model_path).lower()
-            if expected_sha256 and self.actual_sha256 != expected_sha256:
-                self.sha256_verified = False
+            if self.actual_sha256 != expected_model_sha:
                 raise ModelIntegrityError(
-                    f"Model SHA-256 mismatch! Expected {expected_sha256}, got {self.actual_sha256}"
+                    f"Model SHA-256 mismatch! Expected {expected_model_sha}, got {self.actual_sha256}"
                 )
-            self.sha256_verified = True
 
-            # 3. Load preprocessor and model
+            # 3. Strict Preprocessing Pipeline SHA-256 Checksum Verification
+            prep_meta = self.metadata.get("preprocessing", {})
+            expected_prep_sha = (
+                prep_meta.get("sha256_checksum", "").strip().lower()
+                if isinstance(prep_meta, dict)
+                else ""
+            )
+            if not expected_prep_sha or len(expected_prep_sha) != 64:
+                raise ModelIntegrityError(
+                    "Preprocessing pipeline expected SHA-256 checksum is missing, empty, or invalid."
+                )
+
+            self.actual_preprocessor_sha256 = self.compute_sha256(prep_path).lower()
+            if self.actual_preprocessor_sha256 != expected_prep_sha:
+                raise ModelIntegrityError(
+                    f"Preprocessing pipeline SHA-256 mismatch! Expected {expected_prep_sha}, got {self.actual_preprocessor_sha256}"
+                )
+
+            # 4. Strict Feature Manifest & Ordering Verification
+            try:
+                with open(feat_manifest_path, encoding="utf-8") as f:
+                    manifest_features = json.load(f)
+            except Exception as err:
+                raise ModelIntegrityError(f"Feature manifest is malformed JSON: {err}") from err
+
+            if len(manifest_features) != EXPECTED_FEATURE_COUNT:
+                raise ModelIntegrityError(
+                    f"Feature manifest count mismatch: expected {EXPECTED_FEATURE_COUNT}, got {len(manifest_features)}"
+                )
+
+            from app.ml.preprocessing import ALL_INPUT_FEATURES
+
+            if manifest_features != ALL_INPUT_FEATURES:
+                raise ModelIntegrityError(
+                    "Feature manifest column ordering does not match canonical ALL_INPUT_FEATURES order."
+                )
+
+            # 5. Load preprocessor and model safely
             logger.info("Loading preprocessing pipeline from %s", prep_path)
             self.preprocessor = joblib.load(prep_path)
 
             logger.info("Loading calibrated model from %s", model_path)
             self.model = joblib.load(model_path)
 
-            # 4. Read operating threshold
+            # 6. Read operating threshold
             self.operating_threshold = float(
                 self.metadata.get("calibration", {}).get(
                     "optimal_screening_threshold", settings.OPERATING_THRESHOLD
                 )
             )
 
-            # 5. Warmup inference
+            # 7. Warmup inference
             self._warmup()
 
+            self.sha256_verified = True
             self.is_loaded = True
             logger.info(
-                "Model %s (v%s) loaded successfully. SHA-256: %s... Operating threshold: %.2f",
+                "Model %s (v%s) & Preprocessor (SHA-256 verified) loaded successfully. Operating threshold: %.2f",
                 self.metadata.get("model_id"),
                 self.metadata.get("version"),
-                self.actual_sha256[:12],
                 self.operating_threshold,
             )
 
@@ -168,7 +231,10 @@ class ModelService:
             "model_id": self.metadata.get("model_id", "unknown"),
             "version": self.metadata.get("version", "unknown"),
             "sha256_verified": self.sha256_verified,
+            "model_sha256": self.actual_sha256,
+            "preprocessor_sha256": self.actual_preprocessor_sha256,
             "operating_threshold": self.operating_threshold,
+            "feature_count": EXPECTED_FEATURE_COUNT,
         }
 
     def get_metadata(self) -> dict[str, Any]:

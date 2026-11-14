@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db
 from app.core.config import settings
-from app.core.security import create_access_token, hash_password, verify_password
+from app.core.rate_limit import limiter
+from app.core.security import (
+    create_access_token,
+    hash_password,
+    verify_dummy_password,
+    verify_password,
+)
 from app.db.models import PredictionRecord, User
 from app.schemas.user import PredictionHistoryItem, Token, UserCreate, UserLogin, UserResponse
 
@@ -20,11 +26,13 @@ router = APIRouter(tags=["User Accounts & Authentication"])
     status_code=status.HTTP_201_CREATED,
     summary="Register a New User Account",
 )
+@limiter.limit(settings.RATE_LIMIT_AUTH)
 def register_user(
+    request: Request,
     payload: UserCreate,
     db: Session = Depends(get_db),
 ) -> UserResponse:
-    """Registers a new researcher or clinician account."""
+    """Registers a new researcher or clinician account with rate-limiting."""
     existing = db.query(User).filter(User.email == payload.email.lower()).first()
     if existing:
         raise HTTPException(
@@ -49,13 +57,24 @@ def register_user(
     status_code=status.HTTP_200_OK,
     summary="Authenticate User and Generate JWT Token",
 )
+@limiter.limit(settings.RATE_LIMIT_AUTH)
 def login_user(
+    request: Request,
     payload: UserLogin,
     db: Session = Depends(get_db),
 ) -> Token:
-    """Authenticates credentials and issues a signed JSON Web Token (JWT)."""
+    """Authenticates credentials in constant time and issues a signed JSON Web Token (JWT)."""
     user = db.query(User).filter(User.email == payload.email.lower()).first()
-    if not user or not verify_password(payload.password, user.hashed_password):
+    if not user:
+        # Constant-time dummy hash computation to mitigate user enumeration timing attacks
+        verify_dummy_password(payload.password)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if not verify_password(payload.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password.",
@@ -108,3 +127,59 @@ def get_user_prediction_history(
         .all()
     )
     return records
+
+
+@router.delete(
+    "/history",
+    status_code=status.HTTP_200_OK,
+    summary="Purge All Prediction History for Authenticated User",
+)
+def purge_user_prediction_history(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Enforces Right to Erasure (GDPR Art. 17 / HIPAA) by deleting all user predictions."""
+    deleted_count = (
+        db.query(PredictionRecord)
+        .filter(PredictionRecord.user_id == current_user.id)
+        .delete()
+    )
+    db.commit()
+    return {
+        "status": "success",
+        "deleted_count": deleted_count,
+        "message": f"Successfully purged {deleted_count} prediction audit records.",
+    }
+
+
+@router.delete(
+    "/history/{record_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Delete Specific Prediction Record for Authenticated User",
+)
+def delete_single_prediction_record(
+    record_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Deletes a single prediction audit record belonging to the authenticated user."""
+    record = (
+        db.query(PredictionRecord)
+        .filter(
+            PredictionRecord.id == record_id,
+            PredictionRecord.user_id == current_user.id,
+        )
+        .first()
+    )
+    if not record:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Prediction record not found or access denied.",
+        )
+    db.delete(record)
+    db.commit()
+    return {
+        "status": "success",
+        "deleted_id": record_id,
+        "message": f"Record {record_id} successfully deleted.",
+    }

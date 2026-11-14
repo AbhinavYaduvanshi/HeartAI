@@ -6,6 +6,13 @@
   "artifact_format": "joblib",
   "artifact_filename": "best_model.joblib",
   "sha256_checksum": "5dc415201016ed1223fd1f4c9cb295e14b2dd64639ad507d63efb16bed51f890",
+  "preprocessing": {
+    "artifact_filename": "preprocessing_pipeline.joblib",
+    "version": "2.1.0",
+    "sha256_checksum": "3a354b5f6fb66bfce97bfc2ad2d92303e46d98a3e093e7069fefa213afc67055",
+    "expected_feature_count": 25,
+    "feature_manifest_filename": "feature_names.json"
+  },
   "calibration": {
     "is_calibrated": true,
     "method": "isotonic",

@@ -47,3 +47,4 @@ class PredictionRecord(Base):
 
     # Relationships
     user = relationship("User", back_populates="predictions")
+

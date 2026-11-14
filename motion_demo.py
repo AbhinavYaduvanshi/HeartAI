@@ -68,9 +68,13 @@ def index_page():
                 smoker_check = ui.checkbox("Current / Former Smoker", value=True)
 
             consent_check = ui.checkbox(
-                "I consent to store anonymized telemetry for research",
-                value=True,
+                "I affirmatively consent to store a keyed pseudonymized digest for research audit",
+                value=False,
             ).classes("text-xs text-teal-800 font-medium mt-2")
+            ui.label(
+                "Notice: When enabled, a keyed HMAC-SHA256 digest (not raw answers) is stored for calibration audit. "
+                "You may request deletion at any time."
+            ).classes("text-[10px] text-slate-500 mb-1")
 
             result_banner = ui.column().classes("w-full hidden mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200")
 
@@ -102,6 +106,7 @@ def index_page():
                     "MedCostObstacle": 0,
                     "PersonalDoctor": 1,
                     "user_consent_given": bool(consent_check.value),
+                    "consent_terms_version": "2026.1" if consent_check.value else None,
                 }
                 try:
                     async with httpx.AsyncClient(timeout=5.0) as client:
@@ -260,7 +265,8 @@ def index_page():
                             "Checkup": 1,
                             "MedCostObstacle": 0,
                             "PersonalDoctor": 1,
-                            "user_consent_given": True,
+                            "user_consent_given": False,
+                            "consent_terms_version": None,
                         }
                         try:
                             async with httpx.AsyncClient(timeout=5.0) as client:

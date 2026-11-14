@@ -14,17 +14,28 @@ STANDARD_RESEARCH_LIMITATIONS = [
     "Model probabilities reflect population correlation, not individual biological causality.",
 ]
 
+DEFAULT_PRIVACY_NOTICE = (
+    "Informed Telemetry Policy: When affirmative consent is granted, HeartAI persists only a "
+    "server-side keyed HMAC-SHA256 digest of normalized feature values, calculated probabilities, and "
+    "classification thresholds for calibration auditing. Raw survey responses are never stored. "
+    "Users may delete their prediction history anytime via DELETE /api/v1/auth/history."
+)
+
 
 class PredictionRequest(PatientBRFSSInput):
     """Cardiovascular risk prediction request adhering to CDC BRFSS 2023 survey schema."""
 
     user_consent_given: bool = Field(
         False,
-        description="Explicit user consent to store anonymized prediction telemetry in database",
+        description="Explicit affirmative user consent to store keyed pseudonymized audit digest in research telemetry",
+    )
+    consent_terms_version: str | None = Field(
+        None,
+        description="Version identifier of the informed consent notice acknowledged by the user (e.g. '2026.1')",
     )
     client_id: str | None = Field(
         None,
-        description="Optional client identifier for telemetry tracking",
+        description="Optional client identifier for ephemeral telemetry tracking",
     )
 
 
@@ -83,7 +94,15 @@ class PredictionResponse(BaseModel):
     )
     consent_recorded: bool = Field(
         False,
-        description="True if user provided consent and record was persisted to database",
+        description="True if user provided explicit affirmative consent with valid terms version and record was persisted",
+    )
+    consent_terms_version: str | None = Field(
+        None,
+        description="Version of informed consent terms under which record was processed",
+    )
+    privacy_notice: str = Field(
+        DEFAULT_PRIVACY_NOTICE,
+        description="Mandatory privacy and retention disclosure",
     )
     limitations: list[str] = Field(
         default_factory=lambda: list(STANDARD_RESEARCH_LIMITATIONS),

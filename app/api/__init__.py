@@ -12,3 +12,4 @@ __all__ = [
     "get_current_user",
     "get_optional_current_user",
 ]
+

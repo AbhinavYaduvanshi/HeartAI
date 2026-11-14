@@ -67,3 +67,4 @@ def get_optional_current_user(
         return db.query(User).filter(User.email == payload["sub"]).first()
     except Exception:
         return None
+

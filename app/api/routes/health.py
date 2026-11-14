@@ -44,6 +44,8 @@ def get_system_health() -> HealthResponse:
             version=str(model_status_dict.get("version", "unknown")),
             sha256_verified=bool(model_status_dict.get("sha256_verified", False)),
             operating_threshold=float(model_status_dict.get("operating_threshold", 0.09)),
+            preprocessor_sha256_verified=bool(model_status_dict.get("sha256_verified", False)),
+            feature_count=int(model_status_dict.get("feature_count", 25)),
         ),
         database=DatabaseHealthStatus(
             connected=db_ok,
