@@ -562,9 +562,9 @@ def index_page():
 
             # Dropdown Menu: Clinical Tools
             with ui.element("div").classes("relative"):
-                ui.button("Clinical Tools", icon_right="expand_more").props("flat dense").classes(
+                ui.button("Clinical Tools").props('icon-right="expand_more" flat dense data-dropdown-toggle="tools-dropdown"').classes(
                     "text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-teal-600"
-                ).props('data-dropdown-toggle="tools-dropdown"')
+                )
                 with ui.element("div").props('id="tools-dropdown"').classes("heartai-dropdown-menu absolute top-full mt-2 left-0 hidden p-2 flex flex-col gap-1"):
                     ui.button("Risk Assessment Survey", icon="assessment", on_click=assessment_dialog.open).props("flat dense").classes("text-xs text-left justify-start text-slate-700 dark:text-slate-200 hover:bg-teal-50 dark:hover:bg-slate-800")
                     ui.button("Symptom Triage (112 India)", icon="health_and_safety", on_click=symptom_dialog.open).props("flat dense").classes("text-xs text-left justify-start text-slate-700 dark:text-slate-200 hover:bg-teal-50 dark:hover:bg-slate-800")
@@ -690,9 +690,9 @@ def index_page():
         with ui.row().classes("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mb-10"):
             dashboard_metrics = [
                 ("Population Cohort", "397,870", "CDC BRFSS Usable Records", "groups", "teal"),
-                ("Clinical Sensitivity", "79.6%", "Threshold T = 0.09", "radar", "emerald"),
-                ("Model Specificity", "74.3%", "Balanced CVD Rule-Out", "verified", "purple"),
-                ("Inference Latency", "2.5 ms", "Production P50 Response", "bolt", "cyan"),
+                ("Cohort Sensitivity", "79.6%", "Historical Recall (T = 0.09; Non-Diagnostic)", "radar", "emerald"),
+                ("Cohort Specificity", "74.3%", "Historical Rule-Out (Non-Diagnostic)", "verified", "purple"),
+                ("Inference Latency", "2.5 ms", "Calibrated Estimator Runtime", "bolt", "cyan"),
             ]
             for title, val, sub, icon_name, color_theme in dashboard_metrics:
                 with ui.card().classes("heartai-card-premium p-6 flex flex-col justify-between"):
@@ -737,7 +737,7 @@ def index_page():
                     )
 
     # =========================================================================
-    # 4. ANALYTICS & RISK TRAJECTORY SECTION (Premium Dark — Inspired by Ref 1)
+    # 4. ANALYTICS & RISK TRAJECTORY SECTION (Premium Dark Dashboard — Inspired by Reference 2)
     # =========================================================================
     with ui.element("section").props('id="analytics"').classes("py-20 px-6 md:px-12 bg-slate-50 dark:bg-slate-950/80 border-y border-slate-200 dark:border-slate-800"):
         with ui.column().classes("max-w-7xl mx-auto w-full"):
@@ -829,7 +829,7 @@ def index_page():
                         ui.button(
                             "Aarogya Saathi Model Insights",
                             icon="spa",
-                            on_click=lambda: open_aarogya_with_prompt("Explain the clinical sensitivity (~80%), specificity (~74%), and calibration threshold (0.09) of the HeartAI CDC BRFSS model."),
+                            on_click=lambda: open_aarogya_with_prompt("Explain the historical classification sensitivity (~80%), specificity (~74%), calibration threshold (0.09), and why these reflect CDC population dataset association rather than clinical diagnostic performance."),
                         ).classes("heartai-btn bg-purple-700 hover:bg-purple-800 text-white text-xs px-4 py-2 rounded-lg font-medium")
 
     # =========================================================================

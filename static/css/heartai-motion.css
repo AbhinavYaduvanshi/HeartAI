@@ -2,10 +2,10 @@
  * HeartAI Unified Design System & Advanced Motion Engine
  * Phase: Point 10 — UI/UX Modernization, Dual Theme System & Interactive Navigation
  *
- * Visual Hierarchy:
- * 1. Primary: Teal Futuristic Healthcare (Dominant)
- * 2. Secondary: Purple Glassmorphism (Aarogya Saathi AI & Interactive Modals)
- * 3. Analytics: Premium High-Contrast Dark Interface (Data & Trajectories)
+ * Visual Hierarchy & Reference Mapping:
+ * - Reference 1: Purple Glassmorphism (Aarogya Saathi AI Companion & Interactive Modals)
+ * - Reference 2: Premium High-Contrast Dark Dashboard (Analytics, Trajectories & KPIs)
+ * - Reference 3: Teal Futuristic Healthcare Identity (Dominant Platform Canvas)
  */
 
 /* ==========================================================================
@@ -403,7 +403,7 @@ body,
 }
 
 /* ==========================================================================
-   7. AAROGYA SAATHI AI ASSISTANT — PURPLE GLASSMORPHISM (Ref 2 Inspiration)
+   7. AAROGYA SAATHI AI ASSISTANT — PURPLE GLASSMORPHISM (Ref 1 Inspiration)
    ========================================================================== */
 .aarogya-avatar-btn {
   background: linear-gradient(135deg, #0d9488 0%, #7c3aed 50%, #6366f1 100%);
@@ -459,7 +459,7 @@ body,
 }
 
 /* ==========================================================================
-   8. ANALYTICS & METRIC CARDS (Ref 1 & Ref 3 Inspiration)
+   8. ANALYTICS & METRIC CARDS (Ref 2 & Ref 3 Inspiration)
    ========================================================================== */
 .heartai-analytics-card {
   background: var(--bg-surface);

@@ -17,13 +17,13 @@ HeartAI's design language unifies three distinct modern healthcare visual aesthe
 +-----------------------------------------------------------------------------------+
 |                        HEARTAI UNIFIED DESIGN LANGUAGE                            |
 +-----------------------------------------------------------------------------------+
-|  1. PRIMARY (70%): Teal Futuristic Healthcare (Dominant Brand Canvas)             |
+|  1. PRIMARY (70%): Teal Futuristic Healthcare Identity (Reference 3)              |
 |     - Deep teal (#0d9488), vivid cyan glows, clean clinical layout, anatomical SVGs|
 |                                                                                   |
-|  2. SECONDARY (20%): Purple Glassmorphism (Aarogya Saathi AI Companion)           |
+|  2. SECONDARY (20%): Purple Glassmorphism (Reference 1)                           |
 |     - Translucent lavender, violet accents (#7c3aed, #a855f7), floating orb       |
 |                                                                                   |
-|  3. ACCENT/DATA (10%): High-Contrast Dark Analytics                               |
+|  3. ACCENT/DATA (10%): Premium High-Contrast Dark Dashboard (Reference 2)         |
 |     - Deep charcoal (#090d16), emerald/coral status gauges, high-contrast metrics|
 +-----------------------------------------------------------------------------------+
 ```

@@ -184,7 +184,7 @@ def render_anatomical_heart_svg(
             <!-- Interior vascular anatomical accents -->
             <path d="M 46 22 Q 42 34 35 48" stroke="rgba(255,255,255,0.45)" stroke-width="3" stroke-linecap="round" />
             <path d="M 54 20 Q 58 36 65 46" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round" />
-            <!-- Cyan/Emerald glowing data nodes (Ref 1 & Ref 3) -->
+            <!-- Cyan/Emerald glowing data nodes (Ref 2 & Ref 3) -->
             <circle cx="35" cy="48" r="2.5" fill="#2dd4bf" />
             <circle cx="65" cy="46" r="2.5" fill="#38bdf8" />
             <circle cx="50" cy="35" r="3" fill="#a855f7" />
