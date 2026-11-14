@@ -78,6 +78,9 @@ class Settings(BaseSettings):
     # Rate Limiting
     RATE_LIMIT_DEFAULT: str = "60/minute"
     RATE_LIMIT_AUTH: str = "10/minute"
+    RATE_LIMIT_AI_CHAT: str = "20/minute"
+    RATE_LIMIT_AI_SYMPTOMS: str = "15/minute"
+    RATE_LIMIT_AI_PERSONALIZED: str = "10/minute"
 
     # ML Model Artifacts & Threshold
     MODEL_PATH: str = "models/best_model.joblib"

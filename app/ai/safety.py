@@ -1,6 +1,7 @@
-"""HeartAI Generative AI Medical Safety and Privacy Guardrails.
+"""HeartAI Generative AI Medical Safety and Privacy Guardrails — Aarogya Saathi.
 
-Enforces clinical safety restrictions, emergency symptom detection,
+Enforces clinical safety restrictions, strict HeartAI-only domain validation,
+adversarial prompt-injection prevention, emergency symptom detection,
 PII scrubbing, log anonymization, and mandatory educational disclaimers.
 """
 
@@ -11,14 +12,34 @@ from typing import Any
 
 from google.genai import types
 
-from app.schemas.ai import STANDARD_AI_DISCLAIMER
+from app.schemas.ai import EMERGENCY_CONTACT_NUMBERS, STANDARD_AI_DISCLAIMER
+
+# Standard out-of-domain rejection response required by HeartAI specifications
+OUT_OF_DOMAIN_RESPONSE = (
+    "I'm Aarogya Saathi, HeartAI's health assistant. I can help with HeartAI, heart health, "
+    "cardiovascular symptoms, health metrics, and understanding your assessment results. "
+    "I cannot assist with unrelated topics."
+)
+
+# Prominently features India (112) with guidance to use local emergency numbers
+EMERGENCY_ALERT_MESSAGE = (
+    "🚨 CRITICAL HEALTH ALERT: The symptoms described may indicate an acute cardiovascular "
+    "or neurological emergency (such as a heart attack or acute stroke). "
+    "DO NOT WAIT. Call emergency services immediately:\n"
+    f"• India: {EMERGENCY_CONTACT_NUMBERS['India']}\n"
+    f"• US / Canada: {EMERGENCY_CONTACT_NUMBERS['US / Canada']}\n"
+    f"• United Kingdom: {EMERGENCY_CONTACT_NUMBERS['United Kingdom']}\n"
+    f"• Europe: {EMERGENCY_CONTACT_NUMBERS['Europe']}\n"
+    "Or contact your local emergency response service right away. "
+    "While waiting for assistance: sit or lie down comfortably, stay calm, and do not attempt to drive yourself."
+)
 
 # Acute emergency trigger patterns requiring immediate emergency guidance
 EMERGENCY_KEYWORDS = [
     r"\bcrushing\s+chest\s+pain\b",
     r"\bchest\s+tightness\b",
     r"\bpressure\s+in\s+(my\s+)?chest\b",
-    r"\bpain\s+(radiating|spreading)\s+to\s+(my\s+)?(left\s+)?(arm|jaw|neck|back)\b",
+    r"\bpain\s+(radiating|spreading)\s+to\s+(my\s+)?(left\s+)?(arm|jaw|neck|back|shoulder)\b",
     r"\bsevere\s+(shortness\s+of\s+breath|difficulty\s+breathing)\b",
     r"\bcan'?t\s+breathe\b",
     r"\bsudden\s+(numbness|weakness|paralysis)\b",
@@ -27,23 +48,54 @@ EMERGENCY_KEYWORDS = [
     r"\bsudden\s+loss\s+of\s+consciousness\b",
     r"\bpassed\s+out\b",
     r"\bcollapsed\b",
+    r"\bfainted\b",
+    r"\bsyncope\b",
 ]
 
-EMERGENCY_ALERT_MESSAGE = (
-    "🚨 CRITICAL HEALTH ALERT: The symptoms you described may indicate an acute cardiovascular "
-    "or medical emergency (such as a heart attack or stroke). "
-    "DO NOT WAIT. Call emergency services immediately (911 in the US/Canada, 112 in Europe/India, 999 in the UK, "
-    "or your local emergency number), or go to the nearest emergency department right away. "
-    "While waiting for medical help, sit or lie down comfortably, stay calm, and do not attempt to drive yourself."
-)
+# Prompt-injection, jailbreak, and adversarial role-play patterns
+PROMPT_INJECTION_PATTERNS = [
+    r"\b(ignore|disregard|forget)\s+(all\s+|your\s+|previous\s+)?(instructions?|prompts?|rules?)\b",
+    r"\b(system\s+prompt|reveal\s+your\s+prompt|print\s+your\s+instructions)\b",
+    r"\b(jailbreak|dan\s+mode|developer\s+mode|unfiltered\s+mode)\b",
+    r"\b(you\s+are\s+now|pretend\s+you\s+are|roleplay\s+as|act\s+as)\s+(a\s+)?(hacker|python|coder|terminal|politician|gamer|unrestricted)\b",
+    r"\b(bypass\s+safety|disable\s+guardrails?|ignore\s+domain)\b",
+]
 
-# Prohibited clinical diagnosis and prescription patterns
+# Disallowed topics completely unrelated to HeartAI or cardiology
+DISALLOWED_TOPIC_PATTERNS = [
+    r"\b(write\s+a?\s*(python|javascript|c\+\+|java|rust|sql|html)\s+(script|code|program|function))\b",
+    r"\b(solve\s+this\s+(math|algebra|calculus|equation|homework|physics))\b",
+    r"\b(who\s+won\s+the\s+(election|match|game|super\s+bowl|world\s+cup))\b",
+    r"\b(politics|political\s+party|president|prime\s+minister|democrat|republican|bjp|congress)\b",
+    r"\b(movie\s+recommendations?|celebrity\s+gossip|actor|actress|hollywood|bollywood)\b",
+    r"\b(buy\s+(bitcoin|crypto|stocks|shares)|stock\s+market\s+prediction|forex)\b",
+    r"\b(write\s+an?\s*(essay|poem|song|story|joke))\b",
+]
+
+# Whitelist indicators for legitimate HeartAI and cardiovascular wellness topics
+ALLOWED_DOMAIN_PATTERNS = [
+    r"\b(heartai|heart|cardiac|cardio|cardiovascular|cardiology|cardiologist)\b",
+    r"\b(blood\s+pressure|bp|hypertension|hypotension|systolic|diastolic|mmhg)\b",
+    r"\b(cholesterol|ldl|hdl|triglycerides?|lipids?)\b",
+    r"\b(ecg|ekg|rhythm|arrhythmia|fibrillation|palpitations?|tachycardia|bradycardia)\b",
+    r"\b(pulse|heart\s+rate|bpm|hrv|heart\s+rate\s+variability|spo2|oxygen\s+saturation)\b",
+    r"\b(chest\s+pain|angina|myocardial|infarction|ischemia|artery|atherosclerosis|stroke)\b",
+    r"\b(bmi|body\s+mass\s+index|obesity|weight|overweight)\b",
+    r"\b(smoking|smoker|nicotine|tobacco|alcohol|drinking)\b",
+    r"\b(physical\s+activity|exercise|aerobic|walking|dash\s+diet|mediterranean\s+diet|sodium|salt)\b",
+    r"\b(life'?s\s+essential\s+8|aha|american\s+heart\s+association|sleep\s+hygiene)\b",
+    r"\b(symptoms?|breathlessness|shortness\s+of\s+breath|dyspnea|edema|swelling|dizziness)\b",
+    r"\b(model|prediction|probability|threshold|0\.09|calibration|screening|brfss|cdc|accuracy|sensitivity|specificity)\b",
+    r"\b(aarogya\s+saathi|assistant|features?|analytics|assessment|survey)\b",
+]
+
+# Prohibited clinical diagnosis, prescription, and future-prediction patterns
 DISALLOWED_MEDICAL_PATTERNS = [
-    (r"\b(i\s+diagnose\s+you\s+with|you\s+have\s+been\s+diagnosed\s+with)\b", "diagnosis"),
-    (r"\b(stop\s+taking\s+(your\s+)?(medication|medicine|prescriptions?)|discontinue\s+your\s+pills?)\b", "medication_alteration"),
+    (r"\b(i\s+diagnose\s+you\s+with|you\s+have\s+been\s+diagnosed\s+with|you\s+definitely\s+have)\b", "diagnosis"),
+    (r"\b(stop\s+taking\s+(your\s+)?(medication|medicine|prescriptions?)|discontinue\s+your\s+pills?|change\s+your\s+dose)\b", "medication_alteration"),
     (r"\b(take\s+\d+\s*(mg|milligrams?|tablets?)|prescribe\s+[a-z]+)\b", "prescription"),
-    (r"\b(this\s+prediction\s+is\s+medically\s+verified|confirmed\s+by\s+doctor)\b", "verification_claim"),
-    (r"\b(you\s+definitely\s+have\s+heart\s+disease|you\s+will\s+suffer\s+a\s+heart\s+attack)\b", "definitive_claim"),
+    (r"\b(this\s+prediction\s+is\s+medically\s+verified|confirmed\s+by\s+doctor|proves\s+you\s+have)\b", "verification_claim"),
+    (r"\b(you\s+(will|are\s+going\s+to)\s+suffer\s+a\s+heart\s+attack|future\s+heart\s+attack\s+risk\s+is\s+\d+)\b", "future_event_claim"),
 ]
 
 # PII Regex patterns for input scrubbing
@@ -55,11 +107,42 @@ PII_PATTERNS = [
 ]
 
 
+def validate_heartai_domain(text: str) -> tuple[bool, str | None]:
+    """Validates that a user request belongs strictly to the HeartAI cardiovascular domain.
+
+    Returns:
+        (True, None) if the request is legitimate and relevant.
+        (False, OUT_OF_DOMAIN_RESPONSE) if unrelated, adversarial, or out of scope.
+    """
+    if not text or len(text.strip()) < 2:
+        return False, OUT_OF_DOMAIN_RESPONSE
+
+    lowered = text.lower().strip()
+
+    # 1. Reject Prompt Injection / Roleplay Hijacking
+    for pattern in PROMPT_INJECTION_PATTERNS:
+        if re.search(pattern, lowered):
+            return False, OUT_OF_DOMAIN_RESPONSE
+
+    # 2. Reject Explicitly Disallowed Topics (Programming, politics, entertainment, etc.)
+    for pattern in DISALLOWED_TOPIC_PATTERNS:
+        if re.search(pattern, lowered):
+            return False, OUT_OF_DOMAIN_RESPONSE
+
+    # 3. Check for Actual HeartAI & Cardiovascular Relevance
+    has_relevant_topic = any(re.search(pat, lowered) for pat in ALLOWED_DOMAIN_PATTERNS)
+    if not has_relevant_topic:
+        return False, OUT_OF_DOMAIN_RESPONSE
+
+    return True, None
+
+
 def detect_emergency_symptoms(text: str) -> tuple[bool, str | None]:
     """Scans text for acute emergency cardiovascular or neurological symptoms.
 
+    Executes deterministically BEFORE any Gemini API call.
     Returns:
-        (True, EMERGENCY_ALERT_MESSAGE) if potential emergency indicators found,
+        (True, EMERGENCY_ALERT_MESSAGE) if potential emergency indicators found.
         (False, None) otherwise.
     """
     if not text:
@@ -104,7 +187,7 @@ def sanitize_for_logging(data: Any) -> Any:
 
 
 def validate_and_guard_output(model_output: str) -> str:
-    """Ensures model output contains no prohibited diagnostic or prescriptive claims.
+    """Ensures model output contains no prohibited diagnostic, prescriptive, or future-prediction claims.
 
     If prohibited statements are detected, replaces them with safe educational disclaimers.
     """
@@ -119,27 +202,34 @@ def validate_and_guard_output(model_output: str) -> str:
             if rule_type == "diagnosis":
                 guarded = re.sub(
                     pattern,
-                    "HeartAI cannot diagnose medical conditions, but research indicates that",
+                    "HeartAI cannot diagnose medical conditions, but clinical research indicates that",
                     guarded,
                     flags=re.IGNORECASE,
                 )
             elif rule_type in {"medication_alteration", "prescription"}:
                 guarded = re.sub(
                     pattern,
-                    "Never alter or start medication without consulting your prescribing physician",
+                    "Never start, stop, or alter any medication without direct evaluation by your prescribing physician or doctor",
                     guarded,
                     flags=re.IGNORECASE,
                 )
-            elif rule_type in {"verification_claim", "definitive_claim"}:
+            elif rule_type == "verification_claim":
                 guarded = re.sub(
                     pattern,
-                    "This educational estimate reflects population statistics and is not clinical verification",
+                    "This educational estimate reflects historical population statistics and is not clinical verification",
+                    guarded,
+                    flags=re.IGNORECASE,
+                )
+            elif rule_type == "future_event_claim":
+                guarded = re.sub(
+                    pattern,
+                    "HeartAI's model estimates historical self-reported CVD pattern association and does not predict future acute heart attacks",
                     guarded,
                     flags=re.IGNORECASE,
                 )
 
     # Ensure mandatory educational disclaimer is present
-    if "Educational Cardiovascular Research Assistant" not in guarded and "HeartAI does not provide medical diagnoses" not in guarded:
+    if "Aarogya Saathi" not in guarded and "HeartAI does not provide medical diagnoses" not in guarded:
         guarded = f"{guarded.strip()}\n\n---\n**Disclaimer**: {STANDARD_AI_DISCLAIMER}"
 
     return guarded

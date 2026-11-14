@@ -23,6 +23,11 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
+    # Server-side trusted informed consent state (Point 8.1)
+    consent_given = Column(Boolean, default=False, nullable=False)
+    consent_terms_version = Column(String(32), nullable=True)
+    consent_updated_at = Column(DateTime(timezone=True), nullable=True)
+    consent_revoked = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), default=datetime.datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=datetime.datetime.utcnow)
 

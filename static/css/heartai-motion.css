@@ -283,3 +283,64 @@
   100% { transform: translateY(-8px); }
 }
 
+/* ==========================================================================
+   7. AAROGYA SAATHI (आरोग्य साथी) AI ASSISTANT STYLING
+   ========================================================================== */
+.aarogya-avatar-btn {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 60%, #b45309 100%);
+  box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.4), 0 8px 10px -6px rgba(180, 83, 9, 0.3);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.aarogya-avatar-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 16px 30px -5px rgba(13, 148, 136, 0.5), 0 10px 14px -6px rgba(180, 83, 9, 0.4);
+}
+
+.aarogya-pulse-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 2px solid rgba(20, 184, 166, 0.6);
+  animation: aarogya-ring-pulse 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes aarogya-ring-pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.12); opacity: 0.15; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.aarogya-typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: #0d9488;
+  display: inline-block;
+  animation: aarogya-bounce 1.4s infinite ease-in-out both;
+}
+
+.aarogya-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.aarogya-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes aarogya-bounce {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+.aarogya-emergency-banner {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border-left: 4px solid #ef4444;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aarogya-pulse-ring,
+  .aarogya-typing-dot,
+  .aarogya-avatar-btn {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+

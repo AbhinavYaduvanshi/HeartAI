@@ -27,10 +27,29 @@ class UserResponse(BaseModel):
     id: int
     email: str
     is_active: bool
+    consent_given: bool = False
+    consent_terms_version: str | None = None
+    consent_revoked: bool = False
     created_at: datetime.datetime
 
     class Config:
         from_attributes = True
+
+
+class UserConsentUpdate(BaseModel):
+    """Informed consent update payload."""
+
+    consent_given: bool = Field(..., description="Whether user grants informed research consent")
+    terms_version: str = Field(..., description="Version of terms acknowledged (e.g. '2026.1')")
+
+
+class UserConsentResponse(BaseModel):
+    """Informed consent status for authenticated user."""
+
+    consent_given: bool
+    consent_terms_version: str | None
+    consent_revoked: bool
+    consent_updated_at: datetime.datetime | None
 
 
 class Token(BaseModel):

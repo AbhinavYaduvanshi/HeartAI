@@ -15,7 +15,16 @@ from app.core.security import (
     verify_password,
 )
 from app.db.models import PredictionRecord, User
-from app.schemas.user import PredictionHistoryItem, Token, UserCreate, UserLogin, UserResponse
+from app.schemas.user import (
+    PredictionHistoryItem,
+    Token,
+    UserConsentResponse,
+    UserConsentUpdate,
+    UserCreate,
+    UserLogin,
+    UserResponse,
+)
+from app.services.consent_service import record_user_consent
 
 router = APIRouter(tags=["User Accounts & Authentication"])
 
@@ -106,6 +115,50 @@ def get_authenticated_user_profile(
 ) -> UserResponse:
     """Returns profile for currently authenticated user."""
     return current_user
+
+
+@router.get(
+    "/consent",
+    response_model=UserConsentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get Trusted Consent Status for Authenticated User",
+)
+def get_user_consent_status(
+    current_user: User = Depends(get_current_user),
+) -> UserConsentResponse:
+    """Returns the verified server-side consent state for the authenticated user."""
+    return UserConsentResponse(
+        consent_given=bool(current_user.consent_given),
+        consent_terms_version=current_user.consent_terms_version,
+        consent_revoked=bool(current_user.consent_revoked),
+        consent_updated_at=current_user.consent_updated_at,
+    )
+
+
+@router.post(
+    "/consent",
+    response_model=UserConsentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update Trusted Consent State for Authenticated User",
+)
+def update_user_consent_status(
+    payload: UserConsentUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> UserConsentResponse:
+    """Records or revokes informed consent in the trusted database record."""
+    updated_user = record_user_consent(
+        user=current_user,
+        db=db,
+        consent_given=payload.consent_given,
+        terms_version=payload.terms_version,
+    )
+    return UserConsentResponse(
+        consent_given=bool(updated_user.consent_given),
+        consent_terms_version=updated_user.consent_terms_version,
+        consent_revoked=bool(updated_user.consent_revoked),
+        consent_updated_at=updated_user.consent_updated_at,
+    )
 
 
 @router.get(
