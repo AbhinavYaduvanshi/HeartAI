@@ -45,13 +45,13 @@ HeartAI implements a mobile-first responsive layout utilizing four principal res
 
 ### 2.1. Mobile Layout Adaptations (<768px)
 - **Navigation:** Desktop navigation links and user account pills are collapsed into a slide-in drawer (`#heartai-mobile-menu`). The backdrop is dimmed and blurred (`#heartai-mobile-backdrop`).
-- **Hero & Content Flow:** The hero section stacks vertically, placing the primary clinical value proposition above the interactive anatomical heart visualizer.
+- **Hero & Content Flow:** The hero section stacks vertically, placing the primary cardiovascular health value proposition above the interactive anatomical heart visualizer.
 - **Form Inputs:** Survey and triage modal forms expand to 100% viewport width with minimum 48px input touch targets.
 - **Scroll Lock:** When the mobile menu or any modal dialog is active, `document.body.style.overflow = 'hidden'` prevents background page scrolling.
 
 ### 2.2. Tablet Layout Adaptations (768px to 1024px)
 - **Metrics Grid:** The 4-column KPI section adapts into a balanced 2x2 grid.
-- **Action Hubs:** The Clinical Risk Assessment Hub and Emergency Triage Hub render side-by-side with proportional padding.
+- **Action Hubs:** The Survey Risk Assessment Hub and Emergency Triage Hub render side-by-side with proportional padding.
 
 ### 2.3. Desktop Layout (>1024px)
 - **High-Density Grid:** 4-column KPI cards (`grid-cols-1 md:grid-cols-4`).
@@ -65,7 +65,7 @@ HeartAI implements a mobile-first responsive layout utilizing four principal res
 - All interactive controls (buttons, links, form inputs, dropdown toggles, modal close buttons) are fully operable via `Tab` and `Shift + Tab`.
 - `Enter` and `Space` activate buttons and toggle open/closed states.
 - `Escape` key immediately dismisses:
-  1. The "Clinical Tools" dropdown menu (`.heartai-dropdown-menu`).
+  1. The "Health Tools" dropdown menu (`.heartai-dropdown-menu`).
   2. The mobile navigation drawer.
   3. Active modal overlays.
 
@@ -85,7 +85,7 @@ Mouse clicks do not trigger harsh browser outlines, while keyboard tab navigatio
 
 1. **Theme Toggle Button:**
    - Includes `aria-label="Toggle light and dark theme"` and dynamic updates to `Switch to light theme` / `Switch to dark theme`.
-2. **Clinical Tools Dropdown:**
+2. **Health Tools Dropdown:**
    - Decorated with `aria-haspopup="true"` and `data-dropdown-toggle="tools-dropdown"`.
 3. **Emergency Hotline Banner:**
    - Features `role="alert"` and high-contrast red warning iconography, ensuring screen readers immediately announce emergency hotlines (112 / 102) when triage opens.

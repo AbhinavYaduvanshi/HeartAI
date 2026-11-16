@@ -18,7 +18,7 @@ HeartAI's design language unifies three distinct modern healthcare visual aesthe
 |                        HEARTAI UNIFIED DESIGN LANGUAGE                            |
 +-----------------------------------------------------------------------------------+
 |  1. PRIMARY (70%): Teal Futuristic Healthcare Identity (Reference 3)              |
-|     - Deep teal (#0d9488), vivid cyan glows, clean clinical layout, anatomical SVGs|
+|     - Deep teal (#0d9488), vivid cyan glows, clean healthcare layout, anatomical SVGs|
 |                                                                                   |
 |  2. SECONDARY (20%): Purple Glassmorphism (Reference 1)                           |
 |     - Translucent lavender, violet accents (#7c3aed, #a855f7), floating orb       |
@@ -43,7 +43,7 @@ All tokens are defined in `static/css/heartai-motion.css` under `:root, [data-th
 | `--heartai-teal-400` | `#2dd4bf` | `#2dd4bf` | Interactive focus rings / glow |
 | `--heartai-teal-500` | `#14b8a6` | `#14b8a6` | Vibrant brand teal |
 | `--heartai-teal-600` | `#0d9488` | `#0d9488` | **Dominant Primary Brand** |
-| `--heartai-teal-700` | `#0f766e` | `#2dd4bf` | Deep clinical teal / headers |
+| `--heartai-teal-700` | `#0f766e` | `#2dd4bf` | Deep brand teal / headers |
 | `--heartai-teal-glow` | `rgba(13, 148, 136, 0.22)` | `rgba(45, 212, 191, 0.25)` | Elevated card hover glows |
 | `--heartai-purple-500`| `#a855f7` | `#c084fc` | Aarogya Saathi AI badge |
 | `--heartai-purple-600`| `#9333ea` | `#a855f7` | Aarogya Saathi AI accents |
@@ -88,7 +88,7 @@ HeartAI uses system-native clean sans-serif typography (`Inter`, `system-ui`, `-
 ```
 
 ### Numerical Readability
-All clinical counters, heart rates, percentages, and laboratory values use `font-variant-numeric: tabular-nums;` to prevent character width jitter during GSAP live counter animations.
+All telemetry counters, heart rates, percentages, and metrics use `font-variant-numeric: tabular-nums;` to prevent character width jitter during GSAP live counter animations.
 
 ---
 
