@@ -1,0 +1,24 @@
+{
+  "browser": "Google Chrome (Headless CDP)",
+  "viewport_desktop": "1440x920",
+  "viewport_mobile": "390x844",
+  "journeys_tested": {
+    "journey_1_auth": "PASS: Auth modal rendered and credential submission executed",
+    "journey_2_assessment": "PASS: Assessment form rendered and inference successfully calculated",
+    "journey_3_aarogya_emergency": "PASS: Purple glassmorphic AI modal and 112/102 emergency notice rendered",
+    "journey_4_dashboard_analytics": "PASS: Analytics dashboard, ECG SVG, vitals telemetry rendered",
+    "journey_5_consent_privacy": "PASS: Consent checkbox toggle and terms versioning verified in DOM",
+    "journey_6_navigation_themes": "PASS: Dark theme toggled and mobile navigation drawer rendered"
+  },
+  "screenshots_captured": [
+    "uat_01_browser_auth_dialog.png",
+    "uat_01b_browser_auth_success.png",
+    "uat_02_browser_assessment_modal.png",
+    "uat_02b_browser_assessment_calculated.png",
+    "uat_03_browser_aarogya_emergency.png",
+    "uat_04_browser_analytics_dashboard.png",
+    "uat_05_browser_consent_interaction.png",
+    "uat_06a_browser_dark_theme.png",
+    "uat_06b_browser_mobile_drawer.png"
+  ]
+}

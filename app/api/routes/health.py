@@ -43,7 +43,7 @@ def get_system_health() -> HealthResponse:
 
     return HealthResponse(
         status=status_str,
-        service=settings.PROJECT_NAME + " Clinical Intelligence Platform",
+        service=settings.PROJECT_NAME + " Research & Educational Platform",
         version=settings.VERSION,
         uptime_seconds=round(uptime, 2),
         timestamp=datetime.now(UTC).isoformat(),

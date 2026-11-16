@@ -29,7 +29,7 @@ class HealthResponse(BaseModel):
     """Overall system health and telemetry response."""
 
     status: str = Field("healthy", description="Overall health state (healthy, degraded, unhealthy)")
-    service: str = Field("HeartAI Clinical Intelligence Platform", description="Service name")
+    service: str = Field("HeartAI Research & Educational Platform", description="Service name")
     version: str = Field("2.1.0", description="Backend service semantic version")
     uptime_seconds: float = Field(..., description="Service uptime in seconds")
     timestamp: str = Field(..., description="ISO 8601 server timestamp")
