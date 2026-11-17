@@ -9,6 +9,7 @@ User=heartai
 Group=heartai
 WorkingDirectory=/opt/heartai
 EnvironmentFile=/opt/heartai/.env
+ExecStartPre=/opt/heartai/.venv/bin/alembic upgrade head
 ExecStart=/opt/heartai/.venv/bin/gunicorn -c deploy/gunicorn.conf.py main:app
 ExecReload=/bin/kill -s HUP $MAINPID
 KillMode=mixed

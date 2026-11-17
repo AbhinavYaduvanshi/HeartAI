@@ -167,7 +167,7 @@ GRANT ALL PRIVILEGES ON DATABASE heartai_db TO heartai_user;
 GRANT ALL ON SCHEMA public TO heartai_user;
 ```
 
-Initialize database schema using declarative Alembic migrations:
+Initialize database schema using declarative Alembic migrations (note: `heartai-backend.service` also automatically enforces `alembic upgrade head` via `ExecStartPre` before launching application workers):
 ```bash
 cd /opt/heartai
 source .venv/bin/activate
@@ -230,6 +230,7 @@ User=heartai
 Group=heartai
 WorkingDirectory=/opt/heartai
 EnvironmentFile=/opt/heartai/.env
+ExecStartPre=/opt/heartai/.venv/bin/alembic upgrade head
 ExecStart=/opt/heartai/.venv/bin/gunicorn -c deploy/gunicorn.conf.py main:app
 ExecReload=/bin/kill -s HUP $MAINPID
 KillMode=mixed

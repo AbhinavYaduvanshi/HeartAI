@@ -83,9 +83,9 @@ fi
 
 # Check 6: Backend Service Health and Model Checksum
 echo "[Check 6/14] FastAPI Backend Health Endpoint & Model Checksum..."
-HEALTH_JSON=$(curl -s http://127.0.0.1:8000/health || echo "{}")
-BACKEND_STATUS=$(echo "${HEALTH_JSON}" | jq -r '.status // "down"')
-MODEL_LOADED=$(echo "${HEALTH_JSON}" | jq -r '.model_loaded // false')
+HEALTH_JSON=$(curl -s -f --max-time 10 http://127.0.0.1:8000/health 2>/dev/null || echo "{}")
+BACKEND_STATUS=$(echo "${HEALTH_JSON}" | jq -r '.status // "down"' 2>/dev/null || echo "down")
+MODEL_LOADED=$(echo "${HEALTH_JSON}" | jq -r '(.model.loaded // false) | tostring' 2>/dev/null || echo "false")
 if [ "${BACKEND_STATUS}" == "healthy" ] && [ "${MODEL_LOADED}" == "true" ]; then
     check_pass "FastAPI backend healthy and model loaded successfully"
 else

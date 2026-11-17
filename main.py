@@ -1,14 +1,15 @@
-"""HeartAI FastAPI Clinical Intelligence Server.
+"""HeartAI FastAPI Research & Educational Server.
 
-Exposes high-performance REST APIs for cardiovascular risk prediction,
-model metadata introspection, and automated Colab/Drive sync.
+Exposes high-performance REST APIs for cardiovascular risk estimation,
+model metadata introspection, and health education telemetry.
 """
 
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request, Response, status
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -16,9 +17,11 @@ from pydantic import BaseModel, Field
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
+from app.api.deps import get_current_user
 from app.api.routes import ai_router, auth_router, health_router, model_info_router, predict_router
 from app.core.config import settings
 from app.core.rate_limit import limiter
+from app.db.models import User
 from app.db.session import init_db
 from app.ml import (
     ModelMetadata,
@@ -39,11 +42,15 @@ async def lifespan(app: FastAPI):
     """Initializes database tables, ML artifacts, and registry on application startup."""
     logger.info("Initializing HeartAI Platform Services (v%s)...", settings.VERSION)
 
-    # 1. Initialize Database
+    # 1. Initialize Database (REL-03)
     try:
         init_db()
     except Exception as exc:
         logger.error("Database initialization failed: %s", exc)
+        if settings.APP_ENV in {"production", "staging"}:
+            raise RuntimeError(
+                f"Fatal: Database initialization failed during startup in {settings.APP_ENV} mode: {exc}"
+            ) from exc
 
     # 2. Load and verify calibrated production model artifact
     try:
@@ -64,8 +71,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="HeartAI — Clinical Intelligence API",
-    description="Cardiovascular Disease Risk Prediction & Healthcare Telemetry Platform",
+    title="HeartAI — Research & Educational API",
+    description="Cardiovascular Disease Risk Estimation & Healthcare Telemetry Platform",
     version=settings.VERSION,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -139,7 +146,7 @@ def root_status():
 
     return {
         "status": "online",
-        "service": "HeartAI Clinical Intelligence Platform",
+        "service": settings.PROJECT_NAME + " Research & Educational Platform",
         "active_model": active_info,
     }
 
@@ -175,10 +182,46 @@ class DriveSyncRequest(BaseModel):
 
 
 @app.post("/api/v1/models/sync-drive", tags=["Model Transfer"])
-def sync_model_from_drive(request: DriveSyncRequest):
-    """Imports and validates an exported model bundle transferred from Google Drive."""
+def sync_model_from_drive(
+    request: DriveSyncRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """Imports and validates an exported model bundle transferred from Google Drive.
+
+    Permanently disabled in staging and production (SEC-01). Requires authentication
+    and explicit administrative feature flag enablement in development environments.
+    """
+    if not settings.ENABLE_MODEL_IMPORT or settings.APP_ENV in {"production", "staging"}:
+        logger.warning(
+            "Model sync attempt rejected: endpoint is disabled in %s mode (caller: %s)",
+            settings.APP_ENV,
+            current_user.email,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                f"Dynamic model synchronization from filesystem paths is disabled in {settings.APP_ENV} mode "
+                "for security and clinical provenance compliance (SEC-01). Models must be packaged immutably."
+            ),
+        )
+
+    # In development mode when ENABLE_MODEL_IMPORT=True: enforce strict path containment within models/
+    src_path = Path(request.source_dir).resolve()
+    allowed_root = Path("models").resolve()
     try:
-        metadata = transfer_manager.import_from_drive(request.source_dir, set_active=request.set_active)
+        if not src_path.is_relative_to(allowed_root):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Model import path must reside within the authorized models/ directory tree.",
+            )
+    except (ValueError, RuntimeError) as path_err:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or unauthorized model import directory path.",
+        ) from path_err
+
+    try:
+        metadata = transfer_manager.import_from_drive(src_path, set_active=request.set_active)
         return {
             "status": "success",
             "message": f"Model {metadata.model_id} (v{metadata.version}) successfully imported and activated.",

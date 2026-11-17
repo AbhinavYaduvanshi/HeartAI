@@ -9,11 +9,42 @@ from __future__ import annotations
 import logging
 
 from slowapi import Limiter
-from slowapi.util import get_remote_address
+from starlette.requests import Request
 
 from app.core.config import settings
 
 logger = logging.getLogger("heartai.core.rate_limit")
+
+
+def get_trusted_client_ip(request: Request) -> str:
+    """Extracts client IP address safely, trusting forwarded headers ONLY from authorized proxies (REL-02).
+
+    Prevents IP spoofing via crafted X-Forwarded-For or X-Real-IP headers when requests originate
+    from untrusted sources. Prefers X-Real-IP (overwritten by reverse proxy) and falls back to
+    the rightmost proxy-appended entry (parts[-1]) of X-Forwarded-For (Point 13.2B).
+    """
+    client_host = request.client.host if request.client else "127.0.0.1"
+
+    # Parse configured trusted proxy IPs (e.g. "127.0.0.1,::1")
+    trusted_proxies = {ip.strip() for ip in settings.FORWARDED_ALLOW_IPS.split(",") if ip.strip()}
+
+    # If direct connection is NOT from a trusted reverse proxy, use socket host (disregard headers)
+    if client_host not in trusted_proxies:
+        return client_host
+
+    # When connected from trusted proxy (e.g. Nginx on 127.0.0.1), inspect verified forwarded headers
+    x_real_ip = request.headers.get("X-Real-IP")
+    if x_real_ip and x_real_ip.strip():
+        return x_real_ip.strip()
+
+    # Fallback to rightmost proxy-appended address in X-Forwarded-For ($proxy_add_x_forwarded_for)
+    x_forwarded_for = request.headers.get("X-Forwarded-For")
+    if x_forwarded_for and x_forwarded_for.strip():
+        parts = [p.strip() for p in x_forwarded_for.split(",") if p.strip()]
+        if parts:
+            return parts[-1]
+
+    return client_host
 
 
 def resolve_storage_uri() -> str:
@@ -48,7 +79,7 @@ def test_redis_ping(redis_url: str | None = None) -> tuple[bool, str]:
 
 
 limiter = Limiter(
-    key_func=get_remote_address,
+    key_func=get_trusted_client_ip,
     default_limits=[settings.RATE_LIMIT_DEFAULT],
     storage_uri=resolve_storage_uri(),
 )

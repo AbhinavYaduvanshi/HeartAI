@@ -91,18 +91,26 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     LOG_FILE_PATH: str = "logs/heartai.log"
 
-    # Rate Limiting
+    # Rate Limiting & Proxy Trust (REL-02)
     RATE_LIMIT_DEFAULT: str = "60/minute"
     RATE_LIMIT_AUTH: str = "10/minute"
     RATE_LIMIT_AI_CHAT: str = "20/minute"
     RATE_LIMIT_AI_SYMPTOMS: str = "15/minute"
     RATE_LIMIT_AI_PERSONALIZED: str = "10/minute"
+    FORWARDED_ALLOW_IPS: str = Field(
+        "127.0.0.1,::1",
+        description="Comma-separated trusted proxy IPs or CIDRs authorized to forward client headers.",
+    )
 
-    # ML Model Artifacts & Threshold
+    # ML Model Artifacts, Threshold & Transfer Security (SEC-01)
     MODEL_PATH: str = "models/best_model.joblib"
     PREPROCESSOR_PATH: str = "models/preprocessing_pipeline.joblib"
     METADATA_PATH: str = "models/model_metadata.json"
     OPERATING_THRESHOLD: float = 0.09
+    ENABLE_MODEL_IMPORT: bool = Field(
+        False,
+        description="Administrative toggle to permit runtime model import endpoints. Strictly False by default.",
+    )
 
     # Consent Policy Version
     CURRENT_CONSENT_TERMS_VERSION: str = "2026.1"
@@ -225,6 +233,12 @@ class Settings(BaseSettings):
                 raise ValueError(
                     f"Hardcoded localhost BACKEND_API_URL ({self.BACKEND_API_URL}) is forbidden in "
                     "production environments. Configure the production domain or relative URL."
+                )
+            # 5. Prohibit ENABLE_MODEL_IMPORT in production/staging (SEC-01)
+            if self.ENABLE_MODEL_IMPORT:
+                raise ValueError(
+                    f"ENABLE_MODEL_IMPORT is prohibited in {self.APP_ENV} environments (SEC-01). "
+                    "Runtime filesystem model deserialization is strictly disabled."
                 )
         return self
 

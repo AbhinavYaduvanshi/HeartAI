@@ -148,10 +148,13 @@ systemctl start heartai-frontend.service
 
 sleep 4
 
-HEALTH_STATUS=$(curl -s http://127.0.0.1:8000/health | jq -r '.status // "failed"')
-MODEL_LOADED=$(curl -s http://127.0.0.1:8000/health | jq -r '.model_loaded // false')
+# Safe, robust health check parsing using nested .model.loaded and .database.connected (REL-01)
+HEALTH_JSON=$(curl -s -f --max-time 10 http://127.0.0.1:8000/health 2>/dev/null || echo "{}")
+HEALTH_STATUS=$(echo "${HEALTH_JSON}" | jq -r '.status // "failed"' 2>/dev/null || echo "failed")
+MODEL_LOADED=$(echo "${HEALTH_JSON}" | jq -r '(.model.loaded // false) | tostring' 2>/dev/null || echo "false")
+DB_CONNECTED=$(echo "${HEALTH_JSON}" | jq -r '(.database.connected // false) | tostring' 2>/dev/null || echo "false")
 
-if [ "${HEALTH_STATUS}" == "healthy" ] && [ "${MODEL_LOADED}" == "true" ]; then
+if [ "${HEALTH_STATUS}" == "healthy" ] && [ "${MODEL_LOADED}" == "true" ] && [ "${DB_CONNECTED}" == "true" ]; then
     echo "===================================================================="
     echo "Restore Completed and Verified Successfully!"
     echo "Live database '${LIVE_DB}' is operational. Rollback snapshot: '${ROLLBACK_DB}'"

@@ -62,9 +62,26 @@ def check_db_connection() -> tuple[bool, str]:
 
 
 def init_db() -> None:
-    """Creates database tables if they do not exist."""
+    """Initializes database tables in development/test, or verifies connectivity in production/staging.
+
+    In production and staging, schema management is strictly delegated to Alembic migrations (REL-03).
+    """
     # Import models to ensure they are registered with Base.metadata
     from app.db import models  # noqa: F401
+
+    if settings.APP_ENV in {"production", "staging"}:
+        connected, dialect = check_db_connection()
+        if not connected:
+            raise RuntimeError(
+                f"Database connectivity check failed during startup in {settings.APP_ENV} mode (dialect: {dialect}). "
+                "Ensure PostgreSQL is active and credentials in DATABASE_URL are valid."
+            )
+        logger.info(
+            "Database connectivity verified in %s mode (dialect: %s). Schema is managed via Alembic migrations.",
+            settings.APP_ENV,
+            dialect,
+        )
+        return
 
     Base.metadata.create_all(bind=engine)
     logger.info("Database initialized successfully (dialect: %s).", engine.dialect.name)

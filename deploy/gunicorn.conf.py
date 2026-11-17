@@ -6,8 +6,9 @@ Supervises asynchronous Uvicorn workers for FastAPI backend serving.
 import multiprocessing
 import os
 
-# Server socket
+# Server socket & reverse proxy headers (REL-02)
 bind = os.environ.get("GUNICORN_BIND", "127.0.0.1:8000")
+forwarded_allow_ips = os.environ.get("FORWARDED_ALLOW_IPS", "127.0.0.1,::1")
 backlog = 2048
 
 # Worker processes (2 * cores + 1, capped conservatively for medical research ML workload)
