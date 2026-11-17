@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # HeartAI Staging Operational Validation Test Harness
-# Executes 14 comprehensive operational checks against the live staging host.
+# Executes 16 comprehensive operational checks against the live staging host.
 #
 # USAGE: bash deploy/scripts/verify_staging.sh
 # ==============================================================================
@@ -28,7 +28,7 @@ echo "Target Host: $(hostname -f) ($(hostname -I | awk '{print $1}'))"
 echo "===================================================================="
 
 # Check 1: Ubuntu OS and Python Runtime
-echo "[Check 1/14] Ubuntu OS and Python Runtime..."
+echo "[Check 1/16] Ubuntu OS and Python Runtime..."
 UBUNTU_VER=$(lsb_release -rs || echo "unknown")
 PY_VER=$(python3.12 --version 2>&1 || echo "unknown")
 if [[ "${UBUNTU_VER}" =~ "24.04" ]] && [[ "${PY_VER}" =~ "Python 3.12" ]]; then
@@ -38,7 +38,7 @@ else
 fi
 
 # Check 2: PostgreSQL 16 Service and Connection
-echo "[Check 2/14] PostgreSQL 16 Service and Migration Status..."
+echo "[Check 2/16] PostgreSQL 16 Service and Migration Status..."
 if systemctl is-active --quiet postgresql; then
     MIGRATION_VERSION=$(sudo -u postgres psql -d heartai_db -t -A -c "SELECT version_num FROM alembic_version" 2>/dev/null || echo "none")
     if [ "${MIGRATION_VERSION}" == "001" ]; then
@@ -51,7 +51,7 @@ else
 fi
 
 # Check 3: Database Persistence across Query
-echo "[Check 3/14] Database Schema Tables Existence..."
+echo "[Check 3/16] Database Schema Tables Existence..."
 TABLE_COUNT=$(sudo -u postgres psql -d heartai_db -t -A -c "SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('users', 'prediction_records')" 2>/dev/null || echo "0")
 if [ "${TABLE_COUNT}" -eq 2 ]; then
     check_pass "Tables 'users' and 'prediction_records' exist in heartai_db"
@@ -60,7 +60,7 @@ else
 fi
 
 # Check 4: Redis Service and Connectivity
-echo "[Check 4/14] Redis 7 Service and Ping..."
+echo "[Check 4/16] Redis 7 Service and Ping..."
 if systemctl is-active --quiet redis-server; then
     REDIS_PING=$(redis-cli ping 2>/dev/null || echo "FAIL")
     if [ "${REDIS_PING}" == "PONG" ]; then
@@ -73,7 +73,7 @@ else
 fi
 
 # Check 5: Redis Outage / Fail-Closed Verification
-echo "[Check 5/14] Rate Limit Storage Invariant..."
+echo "[Check 5/16] Rate Limit Storage Invariant..."
 STORAGE_RESOLVE=$(/opt/heartai/.venv/bin/python -c "from app.core.rate_limit import resolve_storage_uri; print(resolve_storage_uri())" 2>/dev/null || echo "ERROR")
 if [[ "${STORAGE_RESOLVE}" =~ "redis://" ]]; then
     check_pass "Storage resolution correctly returns redis:// in staging"
@@ -82,7 +82,7 @@ else
 fi
 
 # Check 6: Backend Service Health and Model Checksum
-echo "[Check 6/14] FastAPI Backend Health Endpoint & Model Checksum..."
+echo "[Check 6/16] FastAPI Backend Health Endpoint & Model Checksum..."
 HEALTH_JSON=$(curl -s -f --max-time 10 http://127.0.0.1:8000/health 2>/dev/null || echo "{}")
 BACKEND_STATUS=$(echo "${HEALTH_JSON}" | jq -r '.status // "down"' 2>/dev/null || echo "down")
 MODEL_LOADED=$(echo "${HEALTH_JSON}" | jq -r '(.model.loaded // false) | tostring' 2>/dev/null || echo "false")
@@ -92,8 +92,23 @@ else
     check_fail "Backend Health" "Status: ${BACKEND_STATUS}, ModelLoaded: ${MODEL_LOADED}"
 fi
 
-# Check 7: Nginx Reverse Proxy Forwarding
-echo "[Check 7/14] Nginx Reverse Proxy Routing..."
+# Check 7: TLS Certificate Invariants & Permissions (OP-01)
+echo "[Check 7/16] TLS Certificate Invariants & Permissions..."
+TLS_CRT="/etc/heartai/certs/tls.crt"
+TLS_KEY="/etc/heartai/certs/tls.key"
+if [ -f "${TLS_CRT}" ] && [ -f "${TLS_KEY}" ]; then
+    KEY_PERMS=$(stat -c "%a" "${TLS_KEY}" 2>/dev/null || stat -f "%Op" "${TLS_KEY}" 2>/dev/null || echo "unknown")
+    if [[ "${KEY_PERMS}" =~ "600" || "${KEY_PERMS}" =~ "400" ]]; then
+        check_pass "TLS certificates exist with restrictive key permissions (${KEY_PERMS})"
+    else
+        check_fail "TLS Key Permissions" "Key permissions too open: ${KEY_PERMS} (expected 600 or 400)"
+    fi
+else
+    check_fail "TLS Certificates" "Missing certificate (${TLS_CRT}) or key (${TLS_KEY})"
+fi
+
+# Check 8: Nginx Reverse Proxy Forwarding
+echo "[Check 8/16] Nginx Reverse Proxy Routing..."
 NGINX_HEALTH=$(curl -s -k https://127.0.0.1/health | jq -r '.status // "down"' || echo "down")
 if [ "${NGINX_HEALTH}" == "healthy" ]; then
     check_pass "Nginx successfully proxies /health to FastAPI backend over HTTPS"
@@ -101,8 +116,8 @@ else
     check_fail "Nginx Proxy" "Failed to retrieve healthy status via Nginx proxy"
 fi
 
-# Check 8: NiceGUI Frontend & WebSocket Upgrade
-echo "[Check 8/14] NiceGUI Frontend & WebSocket Port..."
+# Check 9: NiceGUI Frontend & WebSocket Upgrade
+echo "[Check 9/16] NiceGUI Frontend & WebSocket Port..."
 FRONTEND_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8080/ || echo "000")
 if [ "${FRONTEND_CODE}" == "200" ]; then
     check_pass "NiceGUI frontend responds with HTTP 200 on port 8080"
@@ -110,8 +125,8 @@ else
     check_fail "NiceGUI Frontend" "Expected HTTP 200, got ${FRONTEND_CODE}"
 fi
 
-# Check 9: Authentication & Consent Schema
-echo "[Check 9/14] User Authentication Endpoints..."
+# Check 10: Authentication & Consent Schema
+echo "[Check 10/16] User Authentication Endpoints..."
 LOGIN_DOCS=$(curl -s http://127.0.0.1:8000/openapi.json | jq -r '.paths["/api/v1/auth/login"] // empty')
 if [ -n "${LOGIN_DOCS}" ]; then
     check_pass "Auth endpoints registered in OpenAPI schema"
@@ -119,8 +134,8 @@ else
     check_fail "Auth Schema" "Missing /api/v1/auth/login endpoint in OpenAPI"
 fi
 
-# Check 10: Model Scientific Invariants (Sha-256 & 0.09 Threshold)
-echo "[Check 10/14] Model Checksum & Scientific Invariants..."
+# Check 11: Model Scientific Invariants (Sha-256 & 0.09 Threshold)
+echo "[Check 11/16] Model Checksum & Scientific Invariants..."
 EXPECTED_M_HASH="5dc415201016ed1223fd1f4c9cb295e14b2dd64639ad507d63efb16bed51f890"
 ACTUAL_M_HASH=$(sha256sum /opt/heartai/models/best_model.joblib | awk '{print $1}')
 if [ "${ACTUAL_M_HASH}" == "${EXPECTED_M_HASH}" ]; then
@@ -129,8 +144,8 @@ else
     check_fail "Model Invariant" "Expected ${EXPECTED_M_HASH}, got ${ACTUAL_M_HASH}"
 fi
 
-# Check 11: Systemd Service Supervision
-echo "[Check 11/14] Systemd Service Supervision..."
+# Check 12: Systemd Service Supervision
+echo "[Check 12/16] Systemd Service Supervision..."
 BACKEND_ACTIVE=$(systemctl is-active heartai-backend.service || echo "inactive")
 FRONTEND_ACTIVE=$(systemctl is-active heartai-frontend.service || echo "inactive")
 if [ "${BACKEND_ACTIVE}" == "active" ] && [ "${FRONTEND_ACTIVE}" == "active" ]; then
@@ -139,16 +154,16 @@ else
     check_fail "Systemd Services" "Backend: ${BACKEND_ACTIVE}, Frontend: ${FRONTEND_ACTIVE}"
 fi
 
-# Check 12: Application Logging & Logrotate
-echo "[Check 12/14] Application Log Files..."
+# Check 13: Application Logging & Logrotate
+echo "[Check 13/16] Application Log Files..."
 if [ -f "/var/log/heartai/heartai.log" ] || [ -d "/var/log/heartai" ]; then
     check_pass "Logging directory /var/log/heartai exists and is accessible"
 else
     check_fail "Logging" "Log directory /var/log/heartai missing"
 fi
 
-# Check 13: Firewall Port Isolation (No Public Postgres/Redis)
-echo "[Check 13/14] UFW Firewall & Loopback Port Isolation..."
+# Check 14: Firewall Port Isolation (No Public Postgres/Redis)
+echo "[Check 14/16] UFW Firewall & Loopback Port Isolation..."
 PG_EXTERNAL=$(ss -tlnp | grep 5432 | grep -v '127.0.0.1' | grep -v '::1' || true)
 REDIS_EXTERNAL=$(ss -tlnp | grep 6379 | grep -v '127.0.0.1' | grep -v '::1' || true)
 if [ -z "${PG_EXTERNAL}" ] && [ -z "${REDIS_EXTERNAL}" ]; then
@@ -157,8 +172,22 @@ else
     check_fail "Port Exposure" "Detected public binding on 5432 or 6379: ${PG_EXTERNAL} ${REDIS_EXTERNAL}"
 fi
 
-# Check 14: Gemini AI Integration State
-echo "[Check 14/14] Gemini Generative AI Status..."
+# Check 15: Backup Encryption Key & Storage Invariants (SEC-06)
+echo "[Check 15/16] Backup Encryption Key & Storage Invariants..."
+BACKUP_KEY="/etc/heartai/backup_key"
+if [ -f "${BACKUP_KEY}" ]; then
+    BK_PERMS=$(stat -c "%a" "${BACKUP_KEY}" 2>/dev/null || stat -f "%Op" "${BACKUP_KEY}" 2>/dev/null || echo "unknown")
+    if [[ "${BK_PERMS}" =~ "400" || "${BK_PERMS}" =~ "600" ]]; then
+        check_pass "Backup encryption key exists with secure permissions (${BK_PERMS})"
+    else
+        check_fail "Backup Key Permissions" "Key permissions too open: ${BK_PERMS} (expected 400 or 600)"
+    fi
+else
+    check_fail "Backup Key" "Missing backup encryption key at ${BACKUP_KEY}"
+fi
+
+# Check 16: Gemini AI Integration State
+echo "[Check 16/16] Gemini Generative AI Status..."
 GEMINI_STATUS=$(echo "${HEALTH_JSON}" | jq -r '.gemini_status // "unconfigured"')
 check_pass "Gemini status reported honestly: ${GEMINI_STATUS} (live connectivity not fabricated)"
 

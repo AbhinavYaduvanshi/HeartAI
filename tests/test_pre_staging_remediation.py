@@ -426,3 +426,154 @@ def test_scientific_invariants_preserved():
     symptom_fields = {"chest_pain", "shortness_of_breath", "dizziness", "palpitations"}
     overlap = symptom_fields.intersection(set(feature_fields))
     assert len(overlap) == 0, f"Symptoms must never enter ML feature schema: {overlap}"
+
+
+# ==============================================================================
+# Point 13.4 & 13.4A Pre-Provisioning Safety Hardening Regression Tests
+# ==============================================================================
+
+
+def test_nginx_canonical_tls_paths():
+    """Verify Nginx configuration uses canonical cert paths and no hardcoded letsencrypt demo paths (OP-01)."""
+    conf = Path("deploy/nginx/heartai.conf").read_text(encoding="utf-8")
+    assert "ssl_certificate /etc/heartai/certs/tls.crt;" in conf
+    assert "ssl_certificate_key /etc/heartai/certs/tls.key;" in conf
+    assert "/etc/letsencrypt/live/your-domain.org" not in conf
+
+
+def test_provision_script_vpn_mode_default_and_preflight_guard():
+    """Verify provision script defaults to VPN mode, validates modes, and guards UFW with Tailscale checks (OP-03)."""
+    script = Path("deploy/scripts/provision_ubuntu24.sh").read_text(encoding="utf-8")
+    assert 'NETWORK_MODE="${NETWORK_MODE:-vpn}"' in script
+    assert 'Must be \'vpn\' or \'allowlist\'' in script
+    assert "tailscale0" in script
+    assert "tailscale ip -4" in script
+    assert "sudo tailscale up" in script
+    assert "CRITICAL SAFETY GUARD" in script
+
+
+def test_provision_script_dry_run_and_non_destructive_firewall():
+    """Verify provision script supports --dry-run, operator confirmation, and non-destructive UFW (OP-03)."""
+    script = Path("deploy/scripts/provision_ubuntu24.sh").read_text(encoding="utf-8")
+    assert "--dry-run" in script
+    assert "DRY_RUN" in script
+    assert "FIREWALL CONFIRMATION REQUIRED" in script
+    assert "Reconciling UFW firewall rules idempotently (non-destructive)..." in script
+    # Verify ufw --force reset is not used in normal reconciliation
+    assert "ufw --force reset" not in script
+
+
+def test_db_credentials_helper_parses_complex_and_percent_encoded_urls():
+    """Verify db_credentials_helper handles special characters, @, :, /, and percent-encoding (OP-04)."""
+    from deploy.scripts.db_credentials_helper import parse_database_url
+
+    # Standard URL
+    res1 = parse_database_url("postgresql://heartai_user:SafePass123@localhost:5432/heartai_db")
+    assert res1["user"] == "heartai_user"
+    assert res1["password"] == "SafePass123"
+    assert res1["dbname"] == "heartai_db"
+
+    # Complex password with percent-encoded special characters (@, :, /, !, #)
+    res2 = parse_database_url("postgresql://heartai_user:P%40ss%3Aw%21ord%2F%2399@127.0.0.1:5432/heartai_staging_db")
+    assert res2["user"] == "heartai_user"
+    assert res2["password"] == "P@ss:w!ord/#99"
+    assert res2["dbname"] == "heartai_staging_db"
+    assert res2["host"] == "127.0.0.1"
+
+
+def test_db_credentials_helper_rejects_malformed_urls_without_leaking_secrets():
+    """Verify db_credentials_helper fails closed on invalid URLs and never exposes secrets in errors (OP-04)."""
+    from deploy.scripts.db_credentials_helper import parse_database_url
+
+    secret_pass = "SuperSecretPlainTextPassword123"
+
+    # 1. Invalid scheme
+    with pytest.raises(ValueError) as exc1:
+        parse_database_url(f"mysql://heartai_user:{secret_pass}@localhost:3306/db")
+    assert "Unsupported database scheme" in str(exc1.value)
+    assert secret_pass not in str(exc1.value)
+
+    # 2. Missing username
+    with pytest.raises(ValueError) as exc2:
+        parse_database_url(f"postgresql://:{secret_pass}@localhost:5432/db")
+    assert "missing username" in str(exc2.value)
+    assert secret_pass not in str(exc2.value)
+
+    # 3. Missing password
+    with pytest.raises(ValueError) as exc3:
+        parse_database_url("postgresql://heartai_user@localhost:5432/db")
+    assert "missing password" in str(exc3.value)
+
+    # 4. Missing database name
+    with pytest.raises(ValueError) as exc4:
+        parse_database_url(f"postgresql://heartai_user:{secret_pass}@localhost:5432/")
+    assert "missing database name" in str(exc4.value)
+    assert secret_pass not in str(exc4.value)
+
+
+def test_db_credentials_helper_sql_escaping():
+    """Verify SQL single-quote escaping prevents syntax breakage and injection (OP-04)."""
+    from deploy.scripts.db_credentials_helper import escape_pg_string_literal
+
+    raw = "P'ass''word'with\"quotes and $dollar"
+    escaped = escape_pg_string_literal(raw)
+    assert "''" in escaped
+    assert raw.count("'") * 2 == escaped.count("'")
+
+
+def test_provision_script_idempotency_and_no_secret_leak():
+    """Verify provision script integrates db_credentials_helper and never prints secrets (OP-04)."""
+    script = Path("deploy/scripts/provision_ubuntu24.sh").read_text(encoding="utf-8")
+    assert "db_credentials_helper.py" in script
+    assert "parse-env" in script
+    assert "Preserving active user without password reset" in script
+    assert "Generated DB Password:" not in script
+    assert "mkdir -p /etc/heartai/certs" in script
+    assert "chmod 700 /etc/heartai/certs" in script
+
+
+def test_backup_script_mandates_restic_and_prohibits_fallback():
+    """Verify backup script strictly mandates Restic and eliminates OpenSSL fallback creation (SEC-06)."""
+    script = Path("deploy/scripts/backup_staging.sh").read_text(encoding="utf-8")
+    # Must fail closed if restic is missing
+    assert "Restic executable not found in PATH" in script
+    # Must fail closed if password file missing
+    assert "Mandatory encryption key file not found" in script
+    # OpenSSL fallback creation must be completely purged from backup script
+    assert "OpenSSL AES-256-CTR streaming fallback" not in script
+    assert "openssl enc -aes-256-ctr" not in script
+    # Restic must be the sole engine
+    assert "restic backup" in script
+
+
+def test_restore_script_tar_traversal_guards():
+    """Verify restore script contains active path traversal checks for archive extractions (SEC-06)."""
+    script = Path("deploy/scripts/restore_staging.sh").read_text(encoding="utf-8")
+    assert "Path traversal sequence" in script
+    assert "grep -E '(^/|\\.\\./)'" in script
+    assert "--no-same-owner" in script
+
+    # Simulate path traversal detection
+    import re
+    traversal_regex = re.compile(r'(^/|\.\./)')
+    assert traversal_regex.search("../../etc/shadow") is not None
+    assert traversal_regex.search("/usr/bin/pwned") is not None
+    assert traversal_regex.search("safe_model_dir/best_model.joblib") is None
+
+
+def test_restore_script_validate_only_mode():
+    """Verify restore script supports non-destructive --validate-only drills without touching live DB (SEC-06)."""
+    script = Path("deploy/scripts/restore_staging.sh").read_text(encoding="utf-8")
+    assert "--validate-only" in script
+    assert "Non-Destructive Disaster Recovery Validation Drill PASSED" in script
+    assert "live database '${LIVE_DB}' and application services were NOT modified" in script
+
+
+def test_verify_staging_script_covers_16_checks_including_tls_and_backup_key():
+    """Verify verify_staging.sh executes 16 checks and includes TLS certificate and backup key assertions."""
+    script = Path("deploy/scripts/verify_staging.sh").read_text(encoding="utf-8")
+    assert "Executes 16 comprehensive operational checks" in script
+    assert "[Check 7/16] TLS Certificate Invariants & Permissions" in script
+    assert "[Check 15/16] Backup Encryption Key & Storage Invariants" in script
+    assert "/etc/heartai/certs/tls.crt" in script
+    assert "/etc/heartai/backup_key" in script

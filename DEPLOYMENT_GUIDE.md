@@ -71,8 +71,8 @@ Log in as the `heartai` user and clone the repository:
 sudo -u heartai -i
 cd /opt/heartai
 
-# Clone repository
-git clone https://github.com/your-org/heart-health-moniter-system.git .
+# Clone repository (replace <OPERATOR_REPOSITORY_URL> with your actual git remote URL)
+git clone <OPERATOR_REPOSITORY_URL> .
 git checkout main
 
 # Create Python 3.12 virtual environment
@@ -99,13 +99,17 @@ python3 -c "import secrets; print(secrets.token_urlsafe(32))"
 Configure `/opt/heartai/.env`:
 
 ```ini
-APP_ENV=production
+# Controlled Staging Configuration Example
+# (For production deployment, change APP_ENV=production and configure public domain)
+APP_ENV=staging
 APP_DEBUG=false
 APP_HOST=127.0.0.1
 APP_PORT=8000
 FRONTEND_HOST=127.0.0.1
 FRONTEND_PORT=8080
-BACKEND_API_URL=https://heartai-staging.your-tailnet.ts.net
+
+# Replace <node-name>.<tailnet>.ts.net with your actual Tailscale MagicDNS FQDN
+BACKEND_API_URL=https://<node-name>.<tailnet>.ts.net
 
 # High-entropy cryptographically secure secret (minimum 32 characters)
 SECRET_KEY=paste_generated_32_plus_char_secret_here
@@ -117,8 +121,8 @@ DATABASE_URL=postgresql://heartai_user:YourStrongPasswordHere@localhost:5432/hea
 # Distributed Rate Limiting Storage
 REDIS_URL=redis://localhost:6379/0
 
-# CORS Whitelist (Production Domains)
-CORS_ORIGINS=["https://heartai-staging.your-tailnet.ts.net"]
+# CORS Allowed Origins (Private Tailscale Domain)
+CORS_ORIGINS=["https://<node-name>.<tailnet>.ts.net"]
 
 # Rate Limiting Tiers
 RATE_LIMIT_DEFAULT=60/minute
@@ -207,6 +211,52 @@ loglevel = os.environ.get("LOG_LEVEL", "info").lower()
 proc_name = "heartai-gunicorn"
 daemon = False
 ```
+
+---
+
+## 6.1 Canonical Deployment Sequence (Ordered Operations)
+
+To ensure fail-closed security and prevent service failure or administrator lockout, operators must execute provisioning in the following strict order:
+
+1. **Tailscale Node Authentication**:
+   Authenticate the staging VM to your private tailnet before modifying any network rules:
+   ```bash
+   sudo tailscale up
+   tailscale status  # Verify node is active with a 100.x.y.z IP
+   ```
+2. **TLS Certificate Issuance**:
+   Generate MagicDNS certificates for the canonical paths:
+   ```bash
+   sudo tailscale cert --cert-file /etc/heartai/certs/tls.crt --key-file /etc/heartai/certs/tls.key <node-name>.<tailnet>.ts.net
+   sudo chmod 644 /etc/heartai/certs/tls.crt && sudo chmod 600 /etc/heartai/certs/tls.key
+   ```
+3. **Host Provisioning & Non-Destructive Firewall Reconciliation**:
+   Run the provisioning script in default VPN mode:
+   ```bash
+   sudo bash deploy/scripts/provision_ubuntu24.sh
+   # (Optional dry run: sudo bash deploy/scripts/provision_ubuntu24.sh --dry-run)
+   ```
+4. **Nginx Reverse Proxy Activation**:
+   Validate Nginx syntax and reload:
+   ```bash
+   sudo nginx -t
+   sudo systemctl enable --now nginx
+   ```
+5. **Database Schema Migrations**:
+   Run Alembic migrations under the unprivileged service user:
+   ```bash
+   sudo -u heartai /opt/heartai/.venv/bin/alembic upgrade head
+   ```
+6. **Application Service Supervision**:
+   Enable and start both decoupled units:
+   ```bash
+   sudo systemctl enable --now heartai-backend.service heartai-frontend.service
+   ```
+7. **Operational Verification**:
+   Execute the 16-point operational validation harness:
+   ```bash
+   bash deploy/scripts/verify_staging.sh
+   ```
 
 ---
 
@@ -313,9 +363,9 @@ server {
     listen [::]:443 ssl http2;
     server_name heartai-staging.your-tailnet.ts.net;
 
-    # SSL / TLS 1.3 Configuration (Tailscale MagicDNS or ACME DNS-01)
-    ssl_certificate /var/lib/tailscale/certs/heartai-staging.crt;
-    ssl_certificate_key /var/lib/tailscale/certs/heartai-staging.key;
+    # SSL / TLS 1.3 Configuration (Canonical paths: Tailscale MagicDNS or ACME DNS-01)
+    ssl_certificate /etc/heartai/certs/tls.crt;
+    ssl_certificate_key /etc/heartai/certs/tls.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
     ssl_prefer_server_ciphers off;
@@ -369,7 +419,30 @@ server {
 }
 ```
 
-Enable site and reload Nginx:
+### 8.1 Provisioning TLS Certificates
+
+Before enabling Nginx, install valid certificates at `/etc/heartai/certs/tls.crt` and `/etc/heartai/certs/tls.key`:
+
+```bash
+# Ensure directory exists with restricted access
+sudo mkdir -p /etc/heartai/certs
+sudo chmod 700 /etc/heartai/certs
+
+# Option A: Tailscale MagicDNS Certificate (Recommended for Private Staging)
+sudo tailscale cert --cert-file /etc/heartai/certs/tls.crt --key-file /etc/heartai/certs/tls.key heartai-staging.your-tailnet.ts.net
+
+# Option B: Custom / Let's Encrypt Public Certificate
+# sudo cp /etc/letsencrypt/live/your-domain.org/fullchain.pem /etc/heartai/certs/tls.crt
+# sudo cp /etc/letsencrypt/live/your-domain.org/privkey.pem /etc/heartai/certs/tls.key
+
+# Set strict permissions
+sudo chmod 644 /etc/heartai/certs/tls.crt
+sudo chmod 600 /etc/heartai/certs/tls.key
+sudo chown -R root:root /etc/heartai/certs
+```
+
+### 8.2 Enable Site and Reload Nginx
+
 ```bash
 sudo cp deploy/nginx/heartai.conf /etc/nginx/sites-available/heartai.conf
 sudo ln -sf /etc/nginx/sites-available/heartai.conf /etc/nginx/sites-enabled/heartai.conf
@@ -428,6 +501,7 @@ HeartAI implements a client-side encrypted backup architecture using Restic and 
 5. **Difference from Storage Provider Encryption**: Cloud provider encryption-at-rest (e.g. AWS S3 SSE-S3) only protects physical drives; it does not protect against compromised cloud credentials or API leaks. Client-side encryption ensures the storage provider receives only encrypted ciphertext chunks without possession of the decryption key.
 6. **Automated Scheduling**: Backups are orchestrated via systemd timer (`heartai-backup.timer`) triggering `heartai-backup.service` hourly.
 7. **Mutual Exclusion**: Script execution is protected by `flock -n /run/lock/heartai-backup.lock` to prevent overlapping runs.
+8. **Mandatory Restic Engine**: In controlled staging, Restic is the sole supported backup engine. Missing Restic or missing encryption keys fail closed immediately without creating unverified fallback archives. Legacy directory archives require explicit operator approval for recovery.
 
 ### 10.2 Enabling Automated Hourly Backups
 ```bash
@@ -458,7 +532,11 @@ sudo /opt/heartai/deploy/scripts/backup_staging.sh
 # Verify repository snapshots:
 sudo RESTIC_PASSWORD_FILE=/etc/heartai/backup_key restic -r /var/backups/heartai snapshots
 
-# Execute safe restore drill (into staging scratch DB first, verified, then promoted):
+# Non-Destructive Validation Drill (Validates snapshot in scratch DB without modifying live state):
+sudo /opt/heartai/deploy/scripts/restore_staging.sh latest --validate-only
+
+# Active Disaster Recovery Restoration (STATE-CHANGING: stops services, swaps database, restarts):
+# WARNING: This alters the active database. Do NOT execute as a harmless test!
 sudo /opt/heartai/deploy/scripts/restore_staging.sh latest --confirm
 ```
 
@@ -466,4 +544,8 @@ sudo /opt/heartai/deploy/scripts/restore_staging.sh latest --confirm
 - **The Incompatibility**: Restic's `forget --prune` command repacks and deletes unreferenced pack files via `s3:DeleteObject`. If AWS S3 Object Lock (WORM) is enabled on the repository bucket, S3 rejects delete operations with `403 ObjectLocked`, causing prune jobs to fail.
 - **Reconciled Staging Strategy**: For staging, use **S3 Bucket Versioning with a 14-day noncurrent version expiration lifecycle rule** (without Object Lock) so that Restic can prune snapshots while versioning protects against deletion or ransomware.
 - **Compliance WORM Archival Mode**: If compliance mandates WORM Object Lock, Restic must be run in append-only mode and `--prune` must be disabled on that bucket. Deletion of expired pack files is deferred entirely to S3 Lifecycle expiration rules matching the legal hold duration.
+
+### 10.5 Cloud Firewall & Out-of-Band (OOB) Recovery
+- **Cloud VPC Security Groups**: Cloud provider firewalls (e.g. AWS Security Group, GCP VPC Firewall) must allow incoming UDP port `41641` (Tailscale WireGuard) and outbound internet traffic. All management ports (TCP 22 for SSH, TCP 443 for HTTPS) should be blocked on public interfaces at the cloud firewall level.
+- **Out-of-Band (OOB) Recovery**: If VPN connectivity fails or firewall rules misbehave, administrators must use their cloud provider's out-of-band console access (AWS EC2 Instance Connect / Cloud Serial Console, GCP Serial Console, or Azure Serial Console) to access the VM without network ingress.
 
