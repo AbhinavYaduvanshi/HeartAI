@@ -1,0 +1,24 @@
+[Unit]
+Description=HeartAI NiceGUI Frontend & Interactive Motion Service
+After=network.target heartai-backend.service
+Wants=heartai-backend.service
+
+[Service]
+Type=simple
+User=heartai
+Group=heartai
+WorkingDirectory=/opt/heartai
+EnvironmentFile=/opt/heartai/.env
+ExecStart=/opt/heartai/.venv/bin/python motion_demo.py
+Restart=always
+RestartSec=5s
+LimitNOFILE=65535
+
+# Security Hardening Directives
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

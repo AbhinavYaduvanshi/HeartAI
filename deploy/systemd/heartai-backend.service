@@ -1,0 +1,27 @@
+[Unit]
+Description=HeartAI FastAPI Backend Service (Gunicorn + Uvicorn)
+After=network.target postgresql.service redis.service
+Wants=postgresql.service redis.service
+
+[Service]
+Type=notify
+User=heartai
+Group=heartai
+WorkingDirectory=/opt/heartai
+EnvironmentFile=/opt/heartai/.env
+ExecStart=/opt/heartai/.venv/bin/gunicorn -c deploy/gunicorn.conf.py main:app
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=30
+Restart=always
+RestartSec=5s
+LimitNOFILE=65535
+
+# Security Hardening Directives
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

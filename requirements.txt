@@ -6,6 +6,7 @@
 # Web Framework & API Backend
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
+gunicorn>=22.0.0; sys_platform != "win32"
 nicegui>=2.0.0
 python-multipart>=0.0.12
 httpx>=0.27.0
@@ -30,6 +31,10 @@ opencv-python>=4.10.0
 # Database & ORM
 sqlalchemy>=2.0.30
 psycopg2-binary>=2.9.9
+alembic>=1.13.0
+
+# Cache & Distributed Rate Limiting
+redis>=5.0.0
 
 # Data Validation & Environment Configuration
 pydantic>=2.8.0

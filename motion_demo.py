@@ -31,6 +31,7 @@ from typing import Any
 import httpx
 from nicegui import app, ui
 
+from app.core.config import settings
 from app.schemas.ai import (
     AIChatRequest,
     SymptomAssessmentInput,
@@ -57,7 +58,7 @@ from motion import (
 # Register static routes
 register_motion_routes(app)
 
-BACKEND_API_URL = "http://localhost:8000"
+BACKEND_API_URL = settings.BACKEND_API_URL
 
 
 @ui.page("/")
@@ -938,4 +939,10 @@ def index_page():
 
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(title="HeartAI — Advanced Motion & Aarogya Saathi Demo", port=8080, reload=False, show=False)
+    ui.run(
+        title="HeartAI — Advanced Motion & Aarogya Saathi Demo",
+        host=settings.FRONTEND_HOST,
+        port=settings.FRONTEND_PORT,
+        reload=False,
+        show=False,
+    )

@@ -1,0 +1,12 @@
+[Unit]
+Description=Hourly Automated Backup Timer for HeartAI Staging
+Requires=heartai-backup.service
+
+[Timer]
+Unit=heartai-backup.service
+OnCalendar=*-*-* *:00:00
+AccuracySec=1m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

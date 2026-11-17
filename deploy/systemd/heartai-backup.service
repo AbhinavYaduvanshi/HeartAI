@@ -1,0 +1,16 @@
+[Unit]
+Description=HeartAI Staging Automated Database & Secrets Backup (Client-Side Encrypted)
+After=postgresql.service network.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/heartai
+ExecStart=/bin/bash /opt/heartai/deploy/scripts/backup_staging.sh
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=1800
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true

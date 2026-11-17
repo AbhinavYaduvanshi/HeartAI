@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from pydantic import Field, ValidationInfo, field_validator
+from pydantic import Field, ValidationInfo, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DISALLOWED_SECRET_PATTERNS = {
@@ -78,6 +78,18 @@ class Settings(BaseSettings):
         "http://127.0.0.1:8000",
         "http://127.0.0.1:8080",
     ]
+
+    # Frontend Service Configuration
+    FRONTEND_HOST: str = "0.0.0.0"
+    FRONTEND_PORT: int = 8080
+    BACKEND_API_URL: str = Field(
+        "http://localhost:8000",
+        description="Base URL for backend API calls from frontend or proxy.",
+    )
+
+    # Logging Configuration
+    LOG_LEVEL: str = "INFO"
+    LOG_FILE_PATH: str = "logs/heartai.log"
 
     # Rate Limiting
     RATE_LIMIT_DEFAULT: str = "60/minute"
@@ -180,12 +192,41 @@ class Settings(BaseSettings):
     def validate_cors_origins(cls, v: list[str], info: ValidationInfo) -> list[str]:
         """Prohibits wildcard CORS in production environments."""
         env = info.data.get("APP_ENV", "development")
-        if env == "production" and "*" in v:
+        if env in {"production", "staging"} and "*" in v:
             raise ValueError(
-                "Wildcard '*' CORS origin is forbidden in production environments. "
+                f"Wildcard '*' CORS origin is forbidden in {env} environments. "
                 "Specify explicit authorized origins."
             )
         return v
+
+    @model_validator(mode="after")
+    def validate_production_environment(self) -> Settings:
+        """Enforces fail-closed production readiness invariants."""
+        if self.APP_ENV in {"production", "staging"}:
+            # 1. Prohibit SQLite in production/staging
+            if self.DATABASE_URL.startswith("sqlite"):
+                raise ValueError(
+                    f"SQLite ({self.DATABASE_URL}) is prohibited in {self.APP_ENV} environments. "
+                    "A production-grade PostgreSQL database URL is required."
+                )
+            # 2. Require REDIS_URL for distributed rate limiting in production/staging
+            if not self.REDIS_URL or not self.REDIS_URL.strip():
+                raise ValueError(
+                    f"REDIS_URL is required in {self.APP_ENV} environments to enforce "
+                    "distributed rate limiting across multi-worker deployments."
+                )
+            # 3. Prohibit APP_DEBUG in production/staging
+            if self.APP_DEBUG:
+                raise ValueError(f"APP_DEBUG must be False in {self.APP_ENV} environments.")
+            # 4. Prohibit localhost in BACKEND_API_URL in production
+            if self.APP_ENV == "production" and (
+                "localhost" in self.BACKEND_API_URL.lower() or "127.0.0.1" in self.BACKEND_API_URL
+            ):
+                raise ValueError(
+                    f"Hardcoded localhost BACKEND_API_URL ({self.BACKEND_API_URL}) is forbidden in "
+                    "production environments. Configure the production domain or relative URL."
+                )
+        return self
 
     def get_telemetry_hmac_key(self) -> bytes:
         """Returns cryptographically isolated HMAC pepper for telemetry hashing."""
